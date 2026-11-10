@@ -1,0 +1,2215 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Раскадровка финального ролика</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Sofia+Sans+Condensed:wght@700;800;900&display=swap">
+<style>
+/* Layout: одна колонка до 1200px. Переключатель вариантов, экран 16:9, описание варианта, его раскадровка; ниже запасной вид, все варианты карточками, названия, что согласовать */
+:root{
+  --bg:#F0F1EC;
+  --surface:#FAFBF8;
+  --fg:#141715;
+  --muted:#565D58;
+  --line:#D2D7CF;
+  --accent:#5F3BD1;
+  --dot:#7A57F0;
+  --screen:#0B0D0C;
+  --screen-edge:#262B28;
+  --font-display:"Sofia Sans Condensed","Arial Narrow",Impact,sans-serif;
+  --font-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1110; --surface:#161917; --fg:#E7EAE5; --muted:#9AA19C; --line:#2B302D;
+    --accent:#A58AFF; --dot:#A58AFF; --screen:#070807; --screen-edge:#2B302D; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1110; --surface:#161917; --fg:#E7EAE5; --muted:#9AA19C; --line:#2B302D;
+  --accent:#A58AFF; --dot:#A58AFF; --screen:#070807; --screen-edge:#2B302D; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 96px;display:flex;flex-direction:column;gap:80px}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+.eyebrow{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.head{display:flex;flex-direction:column;gap:18px;max-width:900px}
+h1{font-family:var(--font-display);font-weight:900;font-size:clamp(50px,8.6vw,108px);line-height:.9;letter-spacing:-.01em}
+.lead{font-size:clamp(18px,2.1vw,21px);line-height:1.5;max-width:62ch}
+.note{color:var(--muted);font-size:15px;max-width:68ch}
+h2{font-family:var(--font-display);font-weight:800;font-size:clamp(34px,4.6vw,50px);line-height:1}
+h3{font-size:18px;font-weight:600;line-height:1.3}
+.sec{display:flex;flex-direction:column;gap:28px}
+.sec-head{display:flex;flex-direction:column;gap:10px;max-width:760px}
+.sec-head p{color:var(--muted)}
+
+/* Variant switcher */
+.top{display:flex;flex-direction:column;gap:36px}
+.stage{display:flex;flex-direction:column;gap:16px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:15px;font-weight:500;line-height:1.2;padding:9px 15px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background-color .15s ease,color .15s ease,border-color .15s ease}
+.tab:hover{border-color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tab .dot{width:7px;height:7px;border-radius:50%;background:var(--dot);flex:none}
+
+/* Player */
+.player{display:flex;flex-direction:column;gap:14px}
+.screen{position:relative;width:100%;max-width:100%;aspect-ratio:16/9;background:var(--screen);border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px var(--screen-edge),0 24px 60px -30px rgba(0,0,0,.45)}
+.screen canvas,.thumb canvas,.frame canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.controls{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px 16px}
+.btn-play{width:48px;height:48px;border-radius:50%;border:0;background:var(--fg);color:var(--bg);display:grid;place-items:center;cursor:pointer;padding:0}
+.btn-play .i-pause{display:none}
+.btn-play.is-playing .i-play{display:none}
+.btn-play.is-playing .i-pause{display:block}
+.btn-play:focus-visible,.toggle button:focus-visible,.seg:focus-visible,.thumb:focus-visible,.tab:focus-visible,.go:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.clock{display:flex;gap:12px;align-items:baseline;min-width:0;font-variant-numeric:tabular-nums}
+.clock .tm{font-weight:600;font-size:17px;white-space:nowrap}
+.clock .nm{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.toggle{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px}
+.toggle span{font-size:13px;color:var(--muted);padding:0 8px 0 10px;white-space:nowrap}
+.toggle button{border:0;background:none;color:var(--muted);font:inherit;font-size:14px;padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.toggle button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.track{grid-column:1/-1;display:flex;gap:3px;align-items:center}
+.seg{min-width:6px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center}
+.seg i{display:block;width:100%;height:6px;border-radius:3px;background:var(--line);overflow:hidden;position:relative}
+.seg i b{position:absolute;inset:0 auto 0 0;width:0;background:var(--muted)}
+.seg.on i b{background:var(--accent)}
+.seg:hover i{background:var(--muted)}
+@media (max-width:620px){
+  .controls{grid-template-columns:auto minmax(0,1fr)}
+  .toggle{grid-column:1/-1;justify-self:start}
+}
+
+/* Intro above the screen */
+.intro{display:flex;flex-direction:column;gap:18px;padding-block:14px 22px}
+.intro .row{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.intro-grid{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 36px}
+@media (max-width:860px){.intro-grid{grid-template-columns:minmax(0,1fr)}}
+.intro-grid div{min-width:0;display:flex;flex-direction:column;gap:6px}
+.intro-grid dt{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.intro-grid dd{margin:0;font-size:16.5px;line-height:1.5;max-width:46ch}
+
+/* About the selected variant */
+.about{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px 56px;align-items:start}
+@media (max-width:860px){.about{grid-template-columns:minmax(0,1fr)}}
+.about-main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.about-main .row{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.about-main .idea{font-size:18px;max-width:60ch}
+.sr{margin:0;display:flex;flex-direction:column;gap:12px;max-width:62ch}
+.sr dt{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sr dd{margin:2px 0 0;font-size:15.5px}
+.how{display:flex;flex-direction:column;gap:20px;min-width:0}
+.how h3{font-family:var(--font-display);font-weight:800;font-size:25px;line-height:1.05}
+.how p{color:var(--muted);font-size:15px;margin-top:6px}
+.chip{font-size:12px;letter-spacing:.07em;text-transform:uppercase;font-weight:600;color:var(--accent)}
+
+/* Storyboard and variant cards */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:44px 24px}
+.card{display:flex;flex-direction:column;gap:12px;min-width:0}
+.thumb,.frame{position:relative;display:block;width:100%;max-width:100%;aspect-ratio:16/9;background:var(--screen);border-radius:4px;overflow:hidden;border:0;padding:0}
+.thumb{cursor:pointer;transition:box-shadow .15s ease}
+.thumb:hover{box-shadow:0 0 0 2px var(--accent)}
+.card.rec .thumb{box-shadow:0 0 0 2px var(--accent)}
+.meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.meta .tc{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;white-space:nowrap}
+.onscreen{display:flex;flex-direction:column;font-family:var(--font-display);font-weight:700;font-size:21px;line-height:1.2}
+.onscreen .lbl{font-family:var(--font-body);font-weight:500;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.card .d{color:var(--muted);font-size:15px}
+.card .d b{color:var(--fg);font-weight:600}
+.alt-name{font-family:var(--font-display);font-weight:800;font-size:28px;line-height:1.05}
+.card .row{display:flex;gap:12px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.go{align-self:flex-start;border:0;background:none;color:var(--accent);font:inherit;font-size:15px;font-weight:600;padding:0;cursor:pointer}
+.go:hover{text-decoration:underline;text-underline-offset:3px}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px}
+figure{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+figcaption{font-size:15px;color:var(--muted)}
+figcaption b{color:var(--fg);font-weight:600}
+
+/* Names */
+.names{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.name{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px}
+.name.rec{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.name h3{font-family:var(--font-display);font-weight:800;font-size:36px;line-height:1}
+.name p{color:var(--muted);font-size:15px}
+.chip.ghost{color:transparent;user-select:none}
+@media (max-width:640px){.chip.ghost{display:none}}
+
+/* Decisions */
+.decide{margin:0;padding:0;list-style:none;counter-reset:d;display:flex;flex-direction:column;gap:16px;max-width:820px}
+.decide li{counter-increment:d;display:grid;grid-template-columns:44px minmax(0,1fr);align-items:baseline}
+.decide li::before{content:counter(d);font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1;color:var(--accent)}
+.foot{color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion: reduce){.thumb,.tab{transition:none}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <header class="head">
+      <p class="eyebrow">ОТП Банк · Главный банковский день · финальный ролик</p>
+      <h1>Финальный ролик</h1>
+      <p class="lead">4 декабря около 16:40, сразу после последнего круга титров. Около 40 секунд, без звука. Семь вариантов, каждый вырос из своего архетипа бренда, и каждый здесь в движении. Рекомендуем «Сцену после титров».</p>
+      <p class="note">Цифры условные. Кадры схематичные: шрифт, цвет и графику ленты дизайнер делает 12–19 ноября. Здесь согласуем смысл, порядок кадров и тексты на экране.</p>
+    </header>
+
+    <section class="stage" aria-label="Ролик">
+      <div class="tabs" id="tabs" role="tablist" aria-label="Варианты ролика"></div>
+      <div class="player" id="panel" role="tabpanel">
+        <div class="intro" id="intro"></div>
+        <div class="screen" id="screen"><canvas id="main" role="img" aria-label="Финальный ролик"></canvas></div>
+        <div class="controls">
+          <button id="play" class="btn-play" type="button" aria-label="Смотреть">
+            <svg class="i-play" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg>
+            <svg class="i-pause" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z" fill="currentColor"/></svg>
+          </button>
+          <div class="clock"><span class="tm" id="time">−0:04</span><span class="nm" id="sceneName">Конец последнего круга</span></div>
+          <div class="toggle" id="toggle" role="group" aria-label="Вид цифр">
+            <span>Цифры</span>
+            <button type="button" id="modeWindow" aria-pressed="true">Окно в ленту</button>
+            <button type="button" id="modeSolid" aria-pressed="false">Запасной вид</button>
+          </div>
+          <div class="track" id="track"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about" id="about" aria-live="polite"></section>
+  </div>
+
+  <section class="sec" aria-labelledby="h-board">
+    <div class="sec-head">
+      <h2 id="h-board">Раскадровка</h2>
+      <p id="boardSub">Кадр открывается в ролике по нажатию.</p>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-all">
+    <div class="sec-head">
+      <h2 id="h-all">Все варианты</h2>
+      <p>Обложка каждого варианта: его самый характерный кадр. По нажатию вариант открывается в плеере.</p>
+    </div>
+    <div class="board" id="cards"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-safe">
+    <div class="sec-head">
+      <h2 id="h-safe">Запасной вид для «Сцены после титров»</h2>
+      <p>Главный риск рекомендации: текст внутри цифр может не читаться на офисном телевизоре издалека. Запасной вид готовим заранее. Выбираем по тесту ключевых кадров на настоящем экране в офисе к 21 ноября, с фото с 5 и 10 метров.</p>
+    </div>
+    <div class="pair">
+      <figure>
+        <div class="frame"><canvas id="pairA" role="img" aria-label="Число 7 412, внутри цифр имена в полную яркость"></canvas></div>
+        <figcaption><b>Основной.</b> Внутри цифр лента в полную яркость, вокруг та же лента на 15–20%.</figcaption>
+      </figure>
+      <figure>
+        <div class="frame"><canvas id="pairB" role="img" aria-label="Число 7 412 сплошной цифрой, имена внутри на низком контрасте"></canvas></div>
+        <figcaption><b>Запасной.</b> Сплошная цифра, лента внутри на низком контрасте. Читается с любого расстояния, имена видны только вблизи.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-names">
+    <div class="sec-head">
+      <h2 id="h-names">Название финала</h2>
+      <p>Три варианта на выбор.</p>
+    </div>
+    <div class="names">
+      <article class="name rec">
+        <span class="chip">Рекомендуем</span>
+        <h3>«Сцена после титров»</h3>
+        <p>Говорит, где идет ролик и что это. Продолжает формат «Титры» и зовет досмотреть до конца: напоминание 4 декабря пишется само, «Досмотри титры до конца».</p>
+      </article>
+      <article class="name">
+        <span class="chip ghost" aria-hidden="true">Вариант</span>
+        <h3>«В главных ролях»</h3>
+        <p>Готовит развязку: главная роль у каждого. Понятно сразу, без объяснений.</p>
+      </article>
+      <article class="name">
+        <span class="chip ghost" aria-hidden="true">Вариант</span>
+        <h3>«Общий счет»</h3>
+        <p>Язык платформы «На хорошем счету»: счет в банке и счет матча, один на все офисы и города.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-decide">
+    <h2 id="h-decide">Что согласовать</h2>
+    <ol class="decide">
+      <li><span><b>Основа ролика.</b> Рекомендуем «Сцену после титров»: цифры как окна в ленту, в конце единица и остановка ленты. Остальные шесть вариантов на этой странице, тоже в движении.</span></li>
+      <li><span><b>Название финала.</b> Одно из трех: «Сцена после титров», «В главных ролях», «Общий счет».</span></li>
+      <li><span><b>Последняя карточка.</b> «Особая благодарность — тебе / Все 7 412 → каждому» или «С главным банковским днем!». Второй вариант в любом случае стоит на афише.</span></li>
+      <li><span><b>После ролика.</b> Афиша с итогами до конца дня, ролик повторяется каждые 30 минут.</span></li>
+    </ol>
+  </section>
+
+  <p class="foot">Pinkman · 5 ноября 2026 · к сдаче идеи 9 ноября</p>
+</div>
+
+<script>
+/* Engine shared by all concepts. Logical frame 1920x1080, everything is drawn in these units.
+   Concept files use the global E and call registerConcept({...}). */
+var E = (function () {
+  'use strict';
+  var W = 1920, H = 1080;
+  var COL = { bg: '#0B0D0C', fg: '#F3F1E8', egg: '#8A5CF5', eggHi: '#A783FF' };
+  var FD = '"Sofia Sans Condensed","Arial Narrow",Impact,sans-serif';
+  var FB = '"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+  var NB = ' ';
+  var D = {
+    names: '7' + NB + '412',      // имен в титрах
+    thanks: '2' + NB + '318',     // спасибо от коллег
+    coins: '46' + NB + '000',     // коинов за спасибо, только «больше N»
+    eggs: '612',                  // пасхалок нашли
+    eggKinds: '30',               // разных пасхалок в ленте
+    dataTime: '13:00',            // время среза данных, по Москве
+    firstEggMin: '4',             // первую пасхалку нашли через N минут после старта
+    shows: '30'                   // каждое имя на экране больше N раз
+  };
+
+  /* ---------- helpers ---------- */
+  function rng(seed) { var a = seed >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function lerp(a, b, s) { return a + (b - a) * s; }
+  function ease(s) { return s <= 0 ? 0 : s >= 1 ? 1 : s * s * (3 - 2 * s); }
+  /* visibility 0..1 inside [a,b] with fade-in fi and fade-out fo seconds */
+  function win(tt, a, b, fi, fo) { if (tt < a || tt > b) return 0; var i = fi > 0 ? (tt - a) / fi : 1, o = fo > 0 ? (b - tt) / fo : 1; return ease(Math.min(1, i, o)); }
+  function makeCanvas(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; }
+  function rr(x, X, Y, w, h, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); }
+  /* one line of text; a = opacity 0..1; color defaults to warm white */
+  function text(ctx, s, x, y, font, align, a, color) { if (!(a > 0)) return; ctx.globalAlpha = Math.min(1, a); ctx.font = font; ctx.textAlign = align || 'left'; ctx.fillStyle = color || COL.fg; ctx.fillText(s, x, y); ctx.globalAlpha = 1; }
+  /* font string that fits maxW: shrinks size if the text is wider */
+  function fitFont(ctx, s, weight, family, size, maxW) { ctx.font = weight + ' ' + size + 'px ' + family; var w = ctx.measureText(s).width; if (w > maxW) size = Math.floor(size * maxW / w); return weight + ' ' + size + 'px ' + family; }
+
+  var M_FIRST = ['Алексей','Андрей','Антон','Артем','Василий','Виктор','Владимир','Георгий','Григорий','Денис','Дмитрий','Евгений','Иван','Игорь','Илья','Кирилл','Константин','Максим','Михаил','Никита','Николай','Олег','Павел','Роман','Руслан','Сергей','Степан','Тимур','Федор','Юрий'];
+  var F_FIRST = ['Алена','Алина','Анастасия','Анна','Валерия','Вера','Виктория','Галина','Дарья','Екатерина','Елена','Елизавета','Ирина','Кристина','Ксения','Людмила','Маргарита','Марина','Мария','Надежда','Наталья','Ольга','Полина','Светлана','София','Татьяна','Ульяна','Юлия','Яна','Диана'];
+  var SUR = ['Белов','Смирнов','Лебедев','Орлов','Кузнецов','Соколов','Морозов','Волков','Зайцев','Павлов','Семенов','Голубев','Виноградов','Богданов','Воробьев','Федоров','Михайлов','Беляев','Тарасов','Комаров','Киселев','Макаров','Андреев','Ковалев','Ильин','Гусев','Титов','Баранов','Куликов','Алексеев','Степанов','Яковлев','Сорокин','Сергеев','Романов','Захаров','Борисов','Королев','Герасимов','Григорьев','Лазарев','Медведев','Ершов','Никитин','Соболев','Рябов','Поляков','Цветков','Данилов','Жуков','Фролов','Николаев','Крылов','Максимов','Сидоров','Осипов','Белкин','Мельников','Денисов','Гаврилов','Тихонов','Казаков','Филиппов','Калинин','Ефимов','Карпов','Власов','Шубин','Носков','Мухин'];
+  /* deterministic name generator: var p = E.personMaker(5); p() -> 'Ирина Белова' */
+  function personMaker(seed) { var r = rng(seed); return function () { var fem = r() < .5, list = fem ? F_FIRST : M_FIRST; var f = list[Math.floor(r() * list.length)]; var s = SUR[Math.floor(r() * SUR.length)]; return f + ' ' + s + (fem ? 'а' : ''); }; }
+  var QUOTES = ['«Спасибо Марине из ИТ за субботнюю ночь с релизом»','«Спасибо Олегу, что разобрал мою заявку за час»','«Спасибо контакт-центру за спокойствие в самый жаркий день»','«Спасибо Ане за терпение с моими таблицами»','«Спасибо Сергею: без тебя отчет бы не сошелся»','«Спасибо Тимуру за кофе и за код-ревью»','«Спасибо Ольге, что всегда отвечает в чате»','«Спасибо закупкам за ноутбук в срок»','«Спасибо Ирине за лучший онбординг»','«Спасибо Диме за ночную смену в пятницу»','«Спасибо Кате за презентацию, которую не стыдно показать»','«Спасибо Павлу за помощь с переездом»','«Спасибо Юле: ты спасла квартальный отчет»','«Спасибо Максиму, что научил меня SQL»'];
+  /* thanks as «автор → адресат» pairs, for arrows and lists */
+  var PAIRS = ['Олег Смирнов → Марина Белова','Мария Лебедева → Ольга Кузнецова','Анна Орлова → Дмитрий Волков','Тимур Зайцев → Ирина Соколова','Елена Павлова → Сергей Морозов','Кирилл Голубев → Юлия Титова','Наталья Ильина → Павел Гусев','Роман Комаров → Екатерина Тарасова','Вера Макарова → Максим Андреев','Илья Ковалев → Дарья Куликова','Полина Сорокина → Никита Степанов','Георгий Яковлев → Алина Романова'];
+
+  /* ---------- sprites ---------- */
+  var NW_ROWS = 40, NW_RH = 32, QW_ROWS = 34, QW_RH = 36, PL_ROWS = 34, PL_RH = 36, NC_ROWS = 34, NC_RH = 42;
+  function spriteAt(h, ks, painter) { var c = makeCanvas(W * ks, h * ks); var x = c.getContext('2d'); x.setTransform(ks, 0, 0, ks, 0, 0); x.textBaseline = 'alphabetic'; painter(x); return { c: c, h: h }; }
+  function paintNames(x) { var r = rng(11), p = personMaker(7); x.fillStyle = COL.fg; x.textAlign = 'left'; x.font = '700 27px ' + FB; for (var i = 0; i < NW_ROWS; i++) { var px = -r() * 220, y = i * NW_RH + 26; while (px < W) { var n = p(); x.fillText(n, px, y); px += x.measureText(n).width + 34; } } }
+  function paintQuotes(x) { var r = rng(17); x.fillStyle = COL.fg; x.textAlign = 'left'; x.font = '600 27px ' + FB; for (var i = 0; i < QW_ROWS; i++) { var px = -r() * 400, y = i * QW_RH + 27; while (px < W) { var q = QUOTES[Math.floor(r() * QUOTES.length)]; x.fillText(q, px, y); px += x.measureText(q).width + 46; } } }
+  function paintPlates(x) { var r = rng(23); for (var i = 0; i < PL_ROWS; i++) { var px = -r() * 200, y = i * PL_RH + 6; while (px < W) { var w = 80 + r() * 320; x.fillStyle = r() < .5 ? COL.egg : COL.eggHi; rr(x, px, y, w, 26, 6); x.fill(); px += w + 16 + r() * 36; } } }
+  function paintColumn(x) { var p = personMaker(41); x.fillStyle = COL.fg; x.textAlign = 'center'; x.font = '700 34px ' + FB; for (var i = 0; i < NC_ROWS; i++) x.fillText(p(), 960, i * NC_RH + 33); }
+  function creditsLayout() {
+    var p = personMaker(3), r = rng(5);
+    var subs = [
+      { name: 'Розничный бизнес · Москва', head: 'Директор департамента', roles: ['Руководитель направления','Продуктовый менеджер','Ведущий аналитик','Менеджер по работе с клиентами','Старший специалист','Маркетолог'], q: '«Спасибо Ольге, что всегда отвечает в чате»', w: 'Мария Лебедева → Ольга Кузнецова' },
+      { name: 'Управление рисками · Москва', head: 'Руководитель управления', roles: ['Старший риск-менеджер','Риск-менеджер','Аналитик данных','Методолог','Специалист по моделям','Кредитный эксперт'], egg: true, q: '«Спасибо Марине из ИТ за субботнюю ночь с релизом»', w: 'Олег Смирнов → Марина Белова' },
+      { name: 'Контактный центр · Омск', head: 'Руководитель центра', roles: ['Супервайзер','Старший специалист','Специалист контакт-центра','Эксперт по качеству','Тренер'], q: '«Спасибо Диме за ночную смену в пятницу»', w: 'Анна Орлова → Дмитрий Волков' }
+    ];
+    var items = [], ranges = [], y = 110;
+    subs.forEach(function (s) {
+      var y0 = y; items.push({ k: 'h', y: y, t: s.name }); y += 92;
+      var rows = [[s.head, p()]]; for (var i = 0; i < 7; i++) rows.push([s.roles[Math.floor(r() * s.roles.length)], p()]);
+      rows.forEach(function (row, ri) { if (s.egg && ri === 4) { items.push({ k: 'egg', y: y, a: 'Моральная поддержка', b: 'Кофемашина' }); y += 58; } items.push({ k: 'r', y: y, a: row[0], b: row[1] }); y += 50; });
+      y += 30; items.push({ k: 'thx', y: y, ex: p() + ', ' + p(), q: s.q, w: s.w }); y += 380;
+      ranges.push({ y0: y0 - 80, y1: y - 80, name: s.name });
+    });
+    return { items: items, h: y, ranges: ranges };
+  }
+  function paintCredits(x, L) {
+    x.fillStyle = COL.fg;
+    L.items.forEach(function (it) {
+      if (it.k === 'h') { x.globalAlpha = 1; x.textAlign = 'center'; x.font = '700 40px ' + FB; x.fillText(it.t, 960, it.y); }
+      else if (it.k === 'r') { x.textAlign = 'right'; x.globalAlpha = .6; x.font = '400 30px ' + FB; x.fillText(it.a, 930, it.y); x.textAlign = 'left'; x.globalAlpha = 1; x.font = '600 30px ' + FB; x.fillText(it.b, 990, it.y); }
+      else if (it.k === 'egg') { x.globalAlpha = 1; x.fillStyle = COL.egg; rr(x, 500, it.y - 38, 920, 54, 8); x.fill(); x.fillStyle = '#FFFFFF'; x.textAlign = 'right'; x.font = '500 30px ' + FB; x.fillText(it.a, 930, it.y); x.textAlign = 'left'; x.font = '700 30px ' + FB; x.fillText(it.b, 990, it.y); x.fillStyle = COL.fg; }
+      else if (it.k === 'thx') { x.globalAlpha = .35; x.strokeStyle = COL.fg; x.lineWidth = 2; rr(x, 410, it.y, 1100, 230, 10); x.stroke(); x.textAlign = 'center'; x.globalAlpha = .6; x.font = '600 24px ' + FB; x.fillText('Особая благодарность', 960, it.y + 48); x.globalAlpha = 1; x.font = '500 28px ' + FB; x.fillText('Отличные 2026: ' + it.ex, 960, it.y + 98); x.font = '500 30px ' + FB; x.fillText(it.q, 960, it.y + 152); x.globalAlpha = .6; x.font = '400 24px ' + FB; x.fillText(it.w, 960, it.y + 198); }
+    });
+    x.globalAlpha = 1;
+  }
+
+  var api = {};
+  var custom = {};
+  /* builds the shared sprites at ks device pixels per logical unit */
+  function buildSprites(ks) {
+    api.ks = ks; custom = {};
+    var L = creditsLayout();
+    api.S = {
+      credits: spriteAt(L.h, ks, function (x) { paintCredits(x, L); }),   // the tape as it runs for three days
+      names: spriteAt(NW_ROWS * NW_RH, ks, paintNames),                    // dense wall of names, full width
+      quotes: spriteAt(QW_ROWS * QW_RH, ks, paintQuotes),                  // dense wall of thanks quotes
+      plates: spriteAt(PL_ROWS * PL_RH, ks, paintPlates),                  // easter-egg plates, color only
+      column: spriteAt(NC_ROWS * NC_RH, ks, paintColumn),                  // one centered column of names
+      ranges: L.ranges
+    };
+  }
+  /* concept-specific cached sprite: built once per scale. painter(x) draws in logical units, width 1920, height h */
+  function sprite(key, h, painter) { var s = custom[key]; if (!s) { s = spriteAt(h, api.ks || 1, painter); custom[key] = s; } return s; }
+  /* draws a vertically looping sprite scrolled by off (logical px) */
+  function drawLoop(x, spr, off) { var h = spr.h, y = -(((off % h) + h) % h); for (; y < H; y += h) x.drawImage(spr.c, 0, y, W, h); }
+
+  /* the window: sprite visible only inside the glyphs of txt. md 'solid' = fallback look */
+  var scratch = new Map();
+  function getScratch(w, h) { var key = w + 'x' + h, s = scratch.get(key); if (!s) { if (scratch.size > 6) scratch.clear(); var a = makeCanvas(w, h), b = makeCanvas(w, h); s = { a: a, ax: a.getContext('2d'), b: b, bx: b.getContext('2d') }; scratch.set(key, s); } return s; }
+  function drawWindow(ctx, k, txt, F, cx, base, spr, off, md, alpha, glow) {
+    if (alpha <= .001) return;
+    if (md !== 'solid') { ctx.globalAlpha = Math.min(1, alpha) * (glow || .13); ctx.font = '900 ' + F + 'px ' + FD; ctx.textAlign = 'center'; ctx.fillStyle = COL.fg; ctx.fillText(txt, cx, base); ctx.globalAlpha = 1; }
+    var cw = ctx.canvas.width, ch = ctx.canvas.height, s = getScratch(cw, ch);
+    var b = s.bx; b.setTransform(1, 0, 0, 1, 0, 0); b.globalAlpha = 1; b.globalCompositeOperation = 'source-over'; b.clearRect(0, 0, cw, ch); b.setTransform(k, 0, 0, k, 0, 0); drawLoop(b, spr, off);
+    var a = s.ax; a.setTransform(1, 0, 0, 1, 0, 0); a.globalCompositeOperation = 'source-over'; a.globalAlpha = 1; a.clearRect(0, 0, cw, ch); a.setTransform(k, 0, 0, k, 0, 0);
+    a.font = '900 ' + F + 'px ' + FD; a.textAlign = 'center'; a.textBaseline = 'alphabetic'; a.fillStyle = COL.fg; a.fillText(txt, cx, base);
+    a.setTransform(1, 0, 0, 1, 0, 0);
+    if (md === 'solid') { a.globalCompositeOperation = 'destination-out'; a.globalAlpha = .3; a.drawImage(s.b, 0, 0); }
+    else { a.globalCompositeOperation = 'source-in'; a.drawImage(s.b, 0, 0); }
+    a.globalCompositeOperation = 'source-over'; a.globalAlpha = 1;
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = Math.min(1, alpha); ctx.drawImage(s.a, 0, 0); ctx.restore();
+  }
+
+  /* ---------- the tape ---------- */
+  var T0 = -4;
+  /* offset of the tape at time tt. Constant speed from T0; opts.stopAt = video second when it starts
+     to slow down, opts.stopDur = seconds to a full stop. */
+  function tapeOffset(tt, opts) {
+    opts = opts || {}; var V = opts.speed || 120, OFF0 = opts.off0 == null ? 760 : opts.off0;
+    var s = tt - T0; if (opts.stopAt == null) return OFF0 + V * s;
+    var ts = opts.stopAt - T0, d = opts.stopDur || 2; if (s <= ts) return OFF0 + V * s;
+    var tau = Math.min(s - ts, d); return OFF0 + V * ts + V * (tau - tau * tau / (2 * d));
+  }
+  function drawTape(ctx, off, alpha) { if (!(alpha > 0)) return; ctx.globalAlpha = Math.min(1, alpha); drawLoop(ctx, api.S.credits, off); ctx.globalAlpha = 1; }
+  /* name of the subdivision now in the middle of the screen */
+  function creditsLabel(off) { var R = api.S.ranges, h = api.S.credits.h, y = (((off + 540) % h) + h) % h; for (var i = 0; i < R.length; i++) { if (y >= R[i].y0 && y < R[i].y1) return R[i].name; } return R[0].name; }
+  /* bottom-left corner of office screens: «Сейчас в титрах» + subdivision, switching to opts.after at opts.switchAt */
+  function corner(ctx, tt, off, opts) {
+    opts = opts || {}; var sw = opts.switchAt == null ? .9 : opts.switchAt, until = opts.until == null ? 1e9 : opts.until, after = opts.after == null ? 'Итоги трех дней' : opts.after;
+    var a1 = tt < sw - .3 ? 1 : tt < sw + .3 ? 1 - (tt - sw + .3) / .6 : 0, a2 = after ? win(tt, sw, until, .6, .6) : 0;
+    if (a1 > 0) { text(ctx, 'Сейчас в титрах', 80, 975, '500 24px ' + FB, 'left', a1 * .55); text(ctx, creditsLabel(off), 80, 1015, '600 30px ' + FB, 'left', a1); }
+    if (a2 > 0) text(ctx, after, 80, 1015, '600 30px ' + FB, 'left', a2);
+  }
+  function drawQR(ctx, X, Y, s, a) {
+    var n = 25, m = s / n, r = rng(99); ctx.globalAlpha = a; ctx.fillStyle = COL.fg; ctx.fillRect(X - 12, Y - 12, s + 24, s + 24); ctx.fillStyle = COL.bg;
+    for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) { var inF = (i < 8 && j < 8) || (i >= n - 8 && j < 8) || (i < 8 && j >= n - 8); if (!inF && r() < .48) ctx.fillRect(X + i * m, Y + j * m, m + .4, m + .4); }
+    function finder(cx, cy) { ctx.fillStyle = COL.bg; ctx.fillRect(X + cx * m, Y + cy * m, 7 * m, 7 * m); ctx.fillStyle = COL.fg; ctx.fillRect(X + (cx + 1) * m, Y + (cy + 1) * m, 5 * m, 5 * m); ctx.fillStyle = COL.bg; ctx.fillRect(X + (cx + 2) * m, Y + (cy + 2) * m, 3 * m, 3 * m); }
+    finder(0, 0); finder(n - 7, 0); finder(0, n - 7); ctx.globalAlpha = 1;
+  }
+  /* dashed placeholder for the bank lock-up */
+  function lockup(ctx, cx, y, a) { if (!(a > 0)) return; ctx.globalAlpha = a * .45; ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; ctx.setLineDash([10, 8]); rr(ctx, cx - 150, y, 300, 92, 8); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; text(ctx, 'лок-ап', cx, y + 55, '500 26px ' + FB, 'center', a * .5); }
+
+  /* ---------- big numbers ---------- */
+  var Mx = {};
+  var ascRatio = .72;
+  /* call after fonts load: measures Sofia Sans Condensed digits */
+  function measure() {
+    var c = makeCanvas(10, 10).getContext('2d'); c.font = '900 1000px ' + FD;
+    var asc = c.measureText('0123456789').actualBoundingBoxAscent; ascRatio = asc && isFinite(asc) ? asc / 1000 : .72;
+    c.font = '900 660px ' + FD;
+    var F = 660, wmax = Math.max(c.measureText(D.names).width, c.measureText(D.thanks).width, c.measureText(D.eggs).width);
+    if (wmax > 1700) F = Math.floor(660 * 1700 / wmax);
+    var asc6 = ascRatio * F;
+    Mx.F = F; var cy = 540; Mx.base = cy + asc6 / 2; Mx.capY = cy - asc6 / 2 - 72; Mx.subY = Mx.base + 108;
+    Mx.F1 = Math.round(F * 1.25); var asc1 = ascRatio * Mx.F1, cy1 = 500; Mx.base1 = cy1 + asc1 / 2; Mx.cap1Y = Mx.base1 + 112;
+  }
+  /* height of digits for font size F (logical px) */
+  function digitH(F) { return ascRatio * F; }
+
+  /* ---------- frame entry point used by the page ---------- */
+  function drawConcept(c, ctx, k, tt, md) {
+    if (!api.S) return;
+    ctx.setTransform(k, 0, 0, k, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.textBaseline = 'alphabetic';
+    if (ctx.setLineDash) ctx.setLineDash([]);
+    ctx.fillStyle = COL.bg; ctx.fillRect(0, 0, W, H);
+    c.draw(ctx, k, tt, md || 'window');
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; if (ctx.setLineDash) ctx.setLineDash([]);
+  }
+
+  api.W = W; api.H = H; api.COL = COL; api.FD = FD; api.FB = FB; api.NB = NB; api.D = D; api.T0 = T0;
+  api.rng = rng; api.clamp = clamp; api.lerp = lerp; api.ease = ease; api.win = win; api.makeCanvas = makeCanvas; api.rr = rr; api.text = text; api.fitFont = fitFont;
+  api.personMaker = personMaker; api.QUOTES = QUOTES; api.PAIRS = PAIRS;
+  api.S = null; api.ks = 0; api.buildSprites = buildSprites; api.sprite = sprite; api.drawLoop = drawLoop; api.drawWindow = drawWindow;
+  api.tapeOffset = tapeOffset; api.drawTape = drawTape; api.creditsLabel = creditsLabel; api.corner = corner; api.drawQR = drawQR; api.lockup = lockup;
+  api.Mx = Mx; api.measure = measure; api.digitH = digitH; api.drawConcept = drawConcept;
+  return api;
+})();
+var CONCEPTS = [];
+function registerConcept(c) { CONCEPTS.push(c); }
+
+/* ---- 00_after_credits.js ---- */
+/* Рассказчик: «Сцена после титров». Рекомендация. Пример для остальных концепций. */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, COL = E.COL, win = E.win, text = E.text, ease = E.ease;
+  var VIDEO_END = 43, TEND = 51;
+  var STOP = { stopAt: 34, stopDur: 2 };
+
+  var NUMS = [
+    { a: 2, b: 9, cap: 'Имен в титрах', num: D.names, sub: 'Каждое — на экране больше ' + D.shows + ' раз', spr: 'names', pale: 'Имен в титрах: ' + D.names },
+    { a: 9, b: 16, cap: 'Спасибо от коллег', num: D.thanks, sub: 'И с ними больше ' + D.coins + ' коинов', spr: 'quotes', pale: 'Спасибо от коллег: ' + D.thanks },
+    { a: 16, b: 22, cap: 'Пасхалок нашли', num: D.eggs, sub: 'Коды принимаем до конца дня', spr: 'plates', pale: 'Пасхалок нашли: ' + D.eggs }
+  ];
+
+  function paleRow(ctx, tt) {
+    var rowA = tt < 34.5 ? 1 : tt < 35.5 ? 1 - (tt - 34.5) : 0; if (rowA <= 0) return;
+    ctx.font = '500 30px ' + FB; var sep = '     ', sw = ctx.measureText(sep).width;
+    var ws = NUMS.map(function (n) { return ctx.measureText(n.pale).width; }); var total = ws[0] + ws[1] + ws[2] + sw * 2; var x = 960 - total / 2;
+    NUMS.forEach(function (n, i) { var a = win(tt, n.b - .4, 1e9, .6, 0); if (a > 0) { text(ctx, n.pale, x, 88, '500 30px ' + FB, 'left', .5 * a * rowA); if (i > 0) text(ctx, '·', x - sw / 2, 88, '500 30px ' + FB, 'center', .5 * a * rowA); } x += ws[i] + sw; });
+  }
+  function coffee(ctx, tt) {
+    var a = win(tt, 22.1, 27, .6, .5); if (a <= 0) return;
+    ctx.globalAlpha = a; ctx.fillStyle = COL.egg; E.rr(ctx, 220, 430, 1480, 150, 16); ctx.fill();
+    ctx.globalAlpha = 1;
+    text(ctx, 'Моральная поддержка', 925, 526, '500 58px ' + FB, 'right', a, '#FFFFFF');
+    text(ctx, 'Кофемашина', 995, 526, '700 58px ' + FB, 'left', a, '#FFFFFF');
+    text(ctx, 'Нашли первой: через ' + D.firstEggMin + ' минуты после старта', 960, 700, '500 54px ' + FB, 'center', a * .82);
+  }
+  function finalCard(ctx, tt) {
+    var a = win(tt, 37.2, VIDEO_END, .8, .5); if (a <= 0) return;
+    E.rr(ctx, 280, 360, 1360, 330, 12); ctx.globalAlpha = a * .06; ctx.fillStyle = COL.fg; ctx.fill(); ctx.globalAlpha = a * .4; ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; ctx.stroke(); ctx.globalAlpha = 1;
+    text(ctx, 'Особая благодарность — тебе', 960, 515, '700 74px ' + FB, 'center', a);
+    text(ctx, 'Все ' + D.names + ' → каждому', 960, 615, '500 56px ' + FB, 'center', a * .8);
+  }
+  function poster(ctx, tt) {
+    var a = win(tt, 43.2, 1e9, .8, 0); if (a <= 0) return;
+    E.lockup(ctx, 960, 84, a);
+    text(ctx, 'С главным банковским днем!', 960, 330, '900 124px ' + E.FD, 'center', a);
+    [['Имен в титрах', D.names], ['Спасибо от коллег', D.thanks], ['Пасхалок нашли', D.eggs]].forEach(function (r, i) { var y = 490 + i * 124; text(ctx, r[0], 925, y, '500 50px ' + FB, 'right', a * .7); text(ctx, r[1], 985, y + 6, '900 104px ' + E.FD, 'left', a); });
+    text(ctx, 'Данные на ' + D.dataTime + ' по Москве', 960, 890, '500 30px ' + FB, 'center', a * .55);
+    E.drawQR(ctx, 1660, 820, 170, a);
+    text(ctx, 'Введи код пасхалки', 1625, 890, '500 34px ' + FB, 'right', a * .85);
+    text(ctx, 'на сайте праздника', 1625, 935, '500 34px ' + FB, 'right', a * .85);
+  }
+
+  function draw(ctx, k, tt, md) {
+    var S = E.S, Mx = E.Mx;
+    var off = E.tapeOffset(tt, STOP);
+    // the tape dims at 0:00, dims further for the climax, fades out under the poster
+    var dimA = .15 - .08 * ease((tt - 27) / 1.2);
+    var ta = tt < .3 ? 1 : tt < 1.3 ? 1 - (1 - dimA) * ease((tt - .3) / 1) : tt < VIDEO_END ? dimA : tt < VIDEO_END + .8 ? dimA * (1 - (tt - VIDEO_END) / .8) : 0;
+    E.drawTape(ctx, off, ta);
+    var pb = win(tt, VIDEO_END, 1e9, .8, 0); if (pb > 0) { ctx.globalAlpha = .07 * pb; E.drawLoop(ctx, S.names, 700 + 6 * (tt - VIDEO_END)); ctx.globalAlpha = 1; }
+    E.corner(ctx, tt, off, { switchAt: .9, until: VIDEO_END });
+    paleRow(ctx, tt);
+    NUMS.forEach(function (n) {
+      var wa = win(tt, n.a, n.b, .9, .6);
+      if (wa > 0) {
+        E.drawWindow(ctx, k, n.num, Mx.F, 960, Mx.base, S[n.spr], off, md, wa);
+        var ca = win(tt, n.a + .15, n.b, .5, .5);
+        text(ctx, n.cap, 960, Mx.capY, '600 60px ' + FB, 'center', ca);
+        text(ctx, n.sub, 960, Mx.subY, '500 54px ' + FB, 'center', ca * .82);
+      }
+    });
+    coffee(ctx, tt);
+    var oa = win(tt, 27, 37, .9, 1);
+    if (oa > 0) { E.drawWindow(ctx, k, '1', Mx.F1, 960, Mx.base1, S.column, off, md, oa, .2); text(ctx, 'из ' + D.names + ' имен — твое', 960, Mx.cap1Y, '600 64px ' + FB, 'center', win(tt, 27.1, 37, .6, 1)); }
+    finalCard(ctx, tt);
+    poster(ctx, tt);
+  }
+
+  registerConcept({
+    id: 'after-credits',
+    arch: 'Рассказчик',
+    name: 'Сцена после титров',
+    recommended: true,
+    hasMode: true,
+    idea: 'Ролик идет там, где в кино бывает сцена после титров, и досказывает три дня. Цифры работают как окна в ленту: внутри них идет то, что они считают. В конце из 7 412 имен остается одно, твое, и лента впервые встает.',
+    strong: 'Держит большую идею и формат «Титры». Финал сильный при любых цифрах, потому что кульминация не зависит от активности.',
+    risk: 'Текст внутри цифр может не читаться на офисном телевизоре издалека. Запасной вид готов заранее.',
+    take: null,
+    how: [
+      { h: 'Цифра как окно в ленту', p: 'Каждое число набрано огромными цифрами, и внутри них идет лента: в числе имен имена, в числе спасибо цитаты коллег, в числе пасхалок их плашки. Издалека видно число, вблизи люди, из которых оно сложено.' },
+      { h: 'Последней идет единица', p: 'Кульминация в самой маленькой цифре: «1 / из 7 412 имен — твое». Она не зависит от того, сколько набралось спасибо и пасхалок.' },
+      { h: 'Лента встает', p: 'Три дня лента шла без остановки. В финале она впервые замедляется и встает. Последнее слово от всех каждому, в формате блока «Особая благодарность».' }
+    ],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: 6,
+    scenes: [
+      { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно. У ролика нет заставки: он начинается прямо из ленты.' },
+      { a: 0, b: 2, rep: 1.7, title: 'Сигнал', time: '0:00–0:02', screen: ['Угол: «Итоги трех дней»'], text: 'Весь экран за секунду гаснет до 15–20%. Перемену видно с 10 метров, даже на ходу.' },
+      { a: 2, b: 9, rep: 6, title: 'Имена', time: '0:02–0:09', screen: ['Имен в титрах', D.names, 'Каждое — на экране больше ' + D.shows + ' раз'], text: 'Внутри цифр в полную яркость идут имена из ленты, вокруг та же лента приглушена. Число не накручивается: внутри цифр за секунду включается свет.' },
+      { a: 9, b: 16, rep: 13, title: 'Спасибо', time: '0:09–0:16', screen: ['Спасибо от коллег', D.thanks, 'И с ними больше ' + D.coins + ' коинов'], text: 'Внутри цифр цитаты из спасибо коллег. Коины только в подстрочнике, чтобы финал не звучал как отчет о начислениях. Прошлая цифра уходит бледной строкой наверх.' },
+      { a: 16, b: 22, rep: 19.5, title: 'Пасхалки', time: '0:16–0:22', screen: ['Пасхалок нашли', D.eggs, 'Коды принимаем до конца дня'], text: 'Внутри цифр плашки пасхалок, только цвет и без текста, чтобы коды не утекли. Единственный цветной кадр.' },
+      { a: 22, b: 27, rep: 24.6, title: 'Улыбка', time: '0:22–0:27', screen: ['Моральная поддержка: Кофемашина', 'Нашли первой: через ' + D.firstEggMin + ' минуты после старта'], text: 'Плашка пасхалки, которую уже активировали 30 человек, поэтому ее строку можно показать. Если такой нет, кадр выключается и ролик короче на 5 секунд.' },
+      { a: 27, b: 34, rep: 31, title: 'Кульминация', time: '0:27–0:34', screen: ['1', 'из ' + D.names + ' имен — твое'], text: 'Внутри единицы одна колонка имен, как группа в ленте. Этот кадр не зависит от того, сколько набралось спасибо и пасхалок.' },
+      { a: 34, b: 37, rep: 36.4, title: 'Лента встает', time: '0:34–0:37', screen: ['Без текста'], text: 'Лента за 2 секунды замедляется и останавливается впервые с 2 декабря. Единица гаснет.' },
+      { a: 37, b: 43, rep: 40, title: 'Последняя карточка', time: '0:37–0:43', screen: ['Особая благодарность — тебе', 'Все ' + D.names + ' → каждому'], text: 'Формат блока, который три дня шел после каждого подразделения. Последнее слово от всех каждому, без начальника.' },
+      { a: 43, b: 51, rep: 47, title: 'Афиша', time: '0:43 и до конца дня', screen: ['С главным банковским днем!', 'Имен в титрах: ' + D.names, 'Спасибо от коллег: ' + D.thanks, 'Пасхалок нашли: ' + D.eggs, 'Данные на ' + D.dataTime + ' по Москве'], text: 'Стоит до конца дня, ролик повторяется каждые 30 минут. Чистая типографика без текстур: афишу будут фотографировать, она же уходит в письмо с итогами и в архив.' }
+    ],
+    draw: draw
+  });
+})();
+
+/* ---- 01_everyperson.js ---- */
+/* Обычный человек: «Карта круга». Итоги как последнее подразделение титров, весь круг ленты одной картой. */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, FD = E.FD, COL = E.COL, win = E.win, text = E.text, ease = E.ease, lerp = E.lerp, clamp = E.clamp;
+  var VIDEO_END = 43, TEND = 51;
+  var P0 = 3.8, P1 = 7.4;                       // the one big gesture: camera pulls back from the header to the whole circle
+  var AX = 680, GAP = 44, NF = 500, BASE = 660; // big rows: axis, gap to the axis, number size, baseline
+  var DATES = '2\u202F–\u202F4 декабря 2026';   // narrow no-break spaces around the en dash, as in the bank's interface rule
+
+  /* ---------- the circle map: every line of the tape as a thin stroke ---------- */
+  /* Layout in tape units (row pitch 50, column 1100 wide around its axis), flowed into 24 columns and scaled
+     so that one tape pixel = sc map pixels. Rows are not painted one by one: runs of rows are cut from a small
+     atlas of pre-painted strips, so the map is built once with a few thousand calls. */
+  var LAY = null, ATL = [80, 200, 320];          // atlas strip axes: two strips of «role: name» rows, one of 3-column groups
+  function lay() {
+    if (LAY) return LAY;
+    var r = E.rng(412), NCOL = 26, FILL = .55, MH = 770, MW = 1720, TOP = 60;
+    var subs = [], left = 7412, i, j, m;
+    while (left > 0) {
+      var n = r() < .15 ? 140 + Math.floor(r() * 140) : 25 + Math.floor(r() * 110);
+      if (left - n < 25) n = left;
+      subs.push({ n: n, g: n >= 140 && r() < .7 });
+      left -= n;
+    }
+    var idx = subs.map(function (s, k) { return k; });
+    for (i = idx.length - 1; i > 0; i--) { j = Math.floor(r() * (i + 1)); var t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+    idx.slice(0, 30).forEach(function (k) { subs[k].egg = true; });
+    var items = [];
+    subs.forEach(function (s) {
+      items.push({ k: 'h', h: 92, len: 320 + r() * 260 });
+      var rows = [], nr = s.g ? Math.ceil(s.n / 3) : s.n;
+      for (m = 0; m < nr; m++) rows.push({ k: s.g ? 'g' : 'r', h: 50 });
+      if (s.egg) rows.splice(2 + Math.floor(r() * Math.max(1, rows.length - 4)), 0, { k: 'e', h: 58 });
+      Array.prototype.push.apply(items, rows);
+      items.push({ k: 'b', h: 410 });
+    });
+    items.push({ k: 'end', h: 92, len: 420 });   // «Итоги трех дней»: the header after the whole circle
+    var tot = 0; items.forEach(function (it) { tot += it.h; });
+    var Hc = tot / (NCOL - 1 + FILL), col = 0, y = 0;
+    for (var iter = 0; iter < 80; iter++) {
+      col = 0; y = 0;
+      items.forEach(function (it) { var need = it.k === 'h' ? it.h + 150 : it.h; if (y + need > Hc && y > 0) { col++; y = 0; } it.c = col; it.y = y; y += it.h; });
+      if (col <= NCOL - 1) break;
+      Hc *= 1.01;
+    }
+    var span = (NCOL - 1) * 1250 + 1100, sc = Math.min(MH / Hc, MW / span);
+    var x0 = 960 - span * sc / 2, y0 = TOP + (MH - Hc * sc) / 2, NR = Math.floor(1090 / (50 * sc));
+    function ax(c) { return x0 + (550 + c * 1250) * sc; }
+    var segs = [], cur = null;
+    items.forEach(function (it) {
+      if (it.k !== 'r' && it.k !== 'g') { cur = null; return; }
+      if (cur && cur.k === it.k && cur.c === it.c && cur.y + cur.n * 50 === it.y) cur.n++;
+      else { cur = { k: it.k, c: it.c, y: it.y, n: 1 }; segs.push(cur); }
+    });
+    segs.forEach(function (s) { s.v = s.k === 'g' ? 2 : Math.floor(r() * 2); s.src = Math.floor(r() * Math.max(1, NR - s.n)); });
+    var eggs = [], end = items[items.length - 1];
+    items.forEach(function (it) { if (it.k === 'e') eggs.push({ x: ax(it.c), y: y0 + (it.y + 29) * sc, w: 920 * sc }); });
+    eggs.forEach(function (e, k) { e.ord = k / Math.max(1, eggs.length - 1); });
+    LAY = { items: items, segs: segs, sc: sc, NR: NR, ax: ax, y0: y0, xe: ax(end.c), ye: y0 + (end.y + 25) * sc, lastC: end.c, eggs: eggs };
+    return LAY;
+  }
+  /* stroke lengths of the atlas rows. The same numbers paint the atlas sprite and the near view of the zoom, so both match */
+  var LEN = null;
+  function lens() {
+    if (LEN) return LEN;
+    var L = lay(), r = E.rng(7412), i, v, out = { s: [[], []], g: [] };
+    for (v = 0; v < 2; v++) for (i = 0; i < L.NR; i++) out.s[v].push([160 + r() * 300, 180 + r() * 190]);
+    for (i = 0; i < L.NR; i++) out.g.push([170 + r() * 130, 170 + r() * 130, 170 + r() * 130]);
+    return (LEN = out);
+  }
+  var GRP = [-330, 0, 330];
+  /* atlas: strips of rows at map scale. Role stroke left of the axis, dimmer; name stroke right of it */
+  function atlas() {
+    return E.sprite('everyperson-atlas', 1100, function (x) {
+      var L = lay(), N = lens(), sc = L.sc, p = 50 * sc, T = 28 * sc, i, v, q;
+      x.fillStyle = COL.fg;
+      for (v = 0; v < 2; v++) for (i = 0; i < L.NR; i++) {
+        var lr = N.s[v][i][0], ln = N.s[v][i][1], yy = i * p + 11 * sc;
+        x.globalAlpha = .4; x.fillRect(ATL[v] - (30 + lr) * sc, yy, lr * sc, T);
+        x.globalAlpha = .9; x.fillRect(ATL[v] + 30 * sc, yy, ln * sc, T);
+      }
+      x.globalAlpha = .8;
+      for (i = 0; i < L.NR; i++) for (q = 0; q < 3; q++) { var l = N.g[i][q]; x.fillRect(ATL[2] + (GRP[q] - l / 2) * sc, i * p + 11 * sc, l * sc, T); }
+      x.globalAlpha = 1;
+    });
+  }
+  /* headers, easter-egg rows and «Особая благодарность» blocks; ca(column) = opacity of that column */
+  function paintItems(x, L, ca, my0, my1) {
+    var sc = L.sc;
+    L.items.forEach(function (it) {
+      if (it.k === 'r' || it.k === 'g') return;
+      var a = ca(it.c); if (a <= .002) return;
+      var cx = L.ax(it.c), y = L.y0 + it.y * sc; if (y > my1 || y + it.h * sc < my0) return;
+      if (it.k === 'h' || it.k === 'end') { x.globalAlpha = a; x.fillRect(cx - it.len / 2 * sc, y + 8 * sc, it.len * sc, 34 * sc); }
+      else if (it.k === 'e') { x.globalAlpha = .28 * a; x.fillRect(cx - 460 * sc, y + 8 * sc, 920 * sc, 42 * sc); }
+      else if (it.k === 'b') {
+        x.globalAlpha = .35 * a; x.strokeRect(cx - 550 * sc, y + 30 * sc, 1100 * sc, 230 * sc);
+        x.globalAlpha = .45 * a; [[48, 300], [98, 640], [152, 820], [198, 420]].forEach(function (q) { x.fillRect(cx - q[1] / 2 * sc, y + (18 + q[0]) * sc, q[1] * sc, 18 * sc); });
+      }
+    });
+    x.globalAlpha = 1;
+  }
+  function paintMap(x) {
+    var L = lay(), sc = L.sc, p = 50 * sc, A = atlas(), ks = A.c.width / 1920;
+    L.segs.forEach(function (s) { var h = s.n * p; x.drawImage(A.c, (ATL[s.v] - 32) * ks, s.src * p * ks, 64 * ks, h * ks, L.ax(s.c) - 32, L.y0 + s.y * sc, 64, h); });
+    x.fillStyle = COL.fg; x.strokeStyle = COL.fg; x.lineWidth = 1;
+    paintItems(x, L, function () { return 1; }, -1e9, 1e9);
+  }
+  /* near view while the camera pulls back: the same strokes as vectors, only the rows in frame. A magnified
+     sprite would be a blur here. lastA = opacity of the last column, where the real tape still runs */
+  function nearMap(ctx, c, a, lastA) {
+    if (a <= .002) return;
+    var L = lay(), N = lens(), sc = L.sc, p = 50 * sc, T = 28 * sc, s = c.z / sc;
+    var mx0 = L.xe - c.fx / s - 30, mx1 = L.xe + (1920 - c.fx) / s + 30, my0 = L.ye - c.fy / s - p, my1 = L.ye + (1080 - c.fy) / s + p;
+    function ca(ci) { var X = L.ax(ci); return X < mx0 || X > mx1 ? 0 : (ci === L.lastC ? lastA : 1) * a; }
+    ctx.save(); ctx.translate(c.fx, c.fy); ctx.scale(s, s); ctx.translate(-L.xe, -L.ye);
+    ctx.fillStyle = COL.fg; ctx.strokeStyle = COL.fg; ctx.lineWidth = Math.max(2 * sc, 1 / s);
+    L.segs.forEach(function (sg) {
+      var A = ca(sg.c); if (A <= .002) return;
+      var X = L.ax(sg.c), top = L.y0 + sg.y * sc, j0 = Math.max(0, Math.floor((my0 - top) / p)), j1 = Math.min(sg.n - 1, Math.ceil((my1 - top) / p));
+      for (var j = j0; j <= j1; j++) {
+        var i = sg.src + j, y = top + j * p + 11 * sc;
+        if (sg.k === 'g') { ctx.globalAlpha = .8 * A; for (var q = 0; q < 3; q++) { var l = N.g[i][q]; ctx.fillRect(X + (GRP[q] - l / 2) * sc, y, l * sc, T); } }
+        else { var ln = N.s[sg.v][i]; ctx.globalAlpha = .4 * A; ctx.fillRect(X - (30 + ln[0]) * sc, y, ln[0] * sc, T); ctx.globalAlpha = .9 * A; ctx.fillRect(X + 30 * sc, y, ln[1] * sc, T); }
+      }
+    });
+    paintItems(ctx, L, ca, my0, my1);
+    ctx.restore(); ctx.globalAlpha = 1;
+  }
+  function mapSprite() { return E.sprite('everyperson-map', 1080, paintMap); }
+  /* «автор → адресат» pairs, texture behind the thanks row */
+  function pairsSprite() {
+    return E.sprite('everyperson-pairs', 1320, function (x) {
+      var p = E.personMaker(77), r = E.rng(78);
+      x.fillStyle = COL.fg; x.textAlign = 'center'; x.font = '500 26px ' + FB;
+      for (var i = 0; i < 30; i++) { var jt = (r() - .5) * 90; [330, 960, 1590].forEach(function (cx) { x.fillText(p() + ' → ' + p(), cx + jt, i * 44 + 30); }); }
+    });
+  }
+
+  /* ---------- camera ---------- */
+  function camU(tt) { return tt <= P0 ? 0 : ease((tt - P0) / (P1 - P0)); }
+  function cam(tt) { var L = lay(), u = camU(tt); return { u: u, z: Math.exp(u * Math.log(L.sc)), fx: lerp(960, L.xe, u), fy: lerp(540, L.ye, u) }; }
+
+  /* the tape: full, then dimmed, then it shrinks into the last column of the map */
+  function tapeCam(ctx, tt, off) {
+    var c = cam(tt), u = c.u;
+    var ta = tt < 0 ? 1 : tt < P0 ? 1 - .85 * ease(tt / 1) : (.15 + .25 * ease(u / .45)) * (1 - ease((u - .5) / .25));
+    if (ta <= .002) return;
+    var L = lay(), spr = E.S.credits, h = spr.h, base = -(((off % h) + h) % h);
+    var yTop = 540 + (0 - c.fy) / c.z, yBot = 540 + (1080 - c.fy) / c.z;
+    ctx.save();
+    if (u > 0) { ctx.translate(c.fx, c.fy); ctx.scale(c.z, c.z); ctx.translate(-960, -540); }
+    function tiles(y0, y1, a) {
+      if (a <= .002 || y1 <= y0) return;
+      ctx.save();
+      if (u > 0) { ctx.beginPath(); ctx.rect(0, y0, 1920, y1 - y0); ctx.clip(); }
+      ctx.globalAlpha = a;
+      var k0 = Math.floor((y0 - base) / h), k1 = Math.floor((y1 - base) / h);
+      for (var k = k0; k <= k1; k++) ctx.drawImage(spr.c, 0, base + k * h, 1920, h);
+      ctx.restore();
+    }
+    if (u <= 0) tiles(yTop, yBot, ta);
+    else {
+      var cut = 540 - 52, colTop = 540 + (L.y0 - L.ye) / L.sc;   // nothing after the header, nothing above the column top
+      tiles(Math.max(yTop, colTop), Math.min(yBot, cut), ta);
+      tiles(Math.max(yTop, cut), yBot, ta * (1 - ease(u / .25)));
+    }
+    ctx.restore(); ctx.globalAlpha = 1;
+  }
+  function header(ctx, tt) {
+    if (tt < .4 || tt > P1) return;
+    var c = cam(tt), size = 96 * c.z;
+    var a = ease((tt - .4) / .9) * clamp((size - 12) / 28, 0, 1); if (a <= 0) return;
+    var rise = (1 - ease((tt - .4) / 1.8)) * 300;
+    /* like every header in the tape, it gets empty space around it: a soft band of background under the title,
+       as wide as the tape column, so the neighbouring columns of the zoom stay whole */
+    var cy = c.fy + rise * c.z, hh = 150 * c.z, g = ctx.createLinearGradient(0, cy - hh, 0, cy + hh);
+    g.addColorStop(0, 'rgba(11,13,12,0)'); g.addColorStop(.25, COL.bg); g.addColorStop(.75, COL.bg); g.addColorStop(1, 'rgba(11,13,12,0)');
+    ctx.globalAlpha = a * .92; ctx.fillStyle = g; ctx.fillRect(c.fx - 560 * c.z, cy - hh, 1120 * c.z, 2 * hh); ctx.globalAlpha = 1;
+    text(ctx, 'Итоги трех дней', c.fx, c.fy + (35 + rise) * c.z, '700 ' + size.toFixed(2) + 'px ' + FB, 'center', a);
+  }
+
+  /* ---------- the map over time ---------- */
+  /* during the pull-back: neighbouring columns come into frame as soon as they fit, as bright as the tape column,
+     then the whole circle settles at .9 */
+  function zoomA(u) { return ease((u - .08) / .3) * lerp(.32, .9, ease((u - .45) / .45)); }
+  function mapAlpha(tt) {
+    var a = .9;
+    a = lerp(a, .2, ease((tt - 11.7) / .9));      // names row: the map steps back before the row arrives
+    a = lerp(a, .45, ease((tt - 18.6) / .9));     // easter eggs light up
+    a = lerp(a, .18, ease((tt - 21.6) / .9));     // eggs row
+    return a * (1 - ease((tt - 27.6) / .9));      // leaves upward, like a finished subdivision
+  }
+  /* the map stands still: a slow sub-pixel drift makes 1.4 px strokes shimmer on office TVs. It only leaves upward at the end */
+  function mapDy(tt) { return -700 * ease((tt - 27.6) / 1.6); }
+  function drawMap(ctx, tt) {
+    var L = lay(), spr, a;
+    if (tt < P1) {
+      var c = cam(tt), u = c.u, A = zoomA(u); if (A <= .002) return;
+      var lastA = ease((u - .5) / .25), w = ease((u - .58) / .16);   // last column waits for the tape to fade; vectors hand over to the sprite
+      if (w < 1) nearMap(ctx, c, A * (1 - w), lastA);
+      if (w > 0) {
+        var s = c.z / L.sc, X = c.fx - s * L.xe, Y = c.fy - s * L.ye, cut = c.fx - 34 * s;
+        spr = mapSprite();
+        if (cut > 0) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, cut, 1080); ctx.clip(); ctx.globalAlpha = A * w; ctx.drawImage(spr.c, X, Y, 1920 * s, 1080 * s); ctx.restore(); }
+        if (cut < 1920 && lastA > .002) { ctx.save(); ctx.beginPath(); ctx.rect(cut, 0, 1920 - cut, 1080); ctx.clip(); ctx.globalAlpha = A * w * lastA; ctx.drawImage(spr.c, X, Y, 1920 * s, 1080 * s); ctx.restore(); }
+      }
+      ctx.globalAlpha = 1; return;
+    }
+    a = mapAlpha(tt); if (a <= .002) return;
+    ctx.globalAlpha = a; ctx.drawImage(mapSprite().c, 0, mapDy(tt), 1920, 1080); ctx.globalAlpha = 1;
+  }
+  function drawEggs(ctx, tt) {
+    if (tt < 19.2 || tt > 28.6) return;
+    var ga = lerp(1, .7, ease((tt - 21.6) / .9)) * (1 - ease((tt - 27.6) / .9)); if (ga <= .002) return;
+    var dy = mapDy(tt), quiet = .85 * ease((tt - 21.6) / .9);
+    /* while the «612» row stands, marks under its text step back so the digits and lines stay clean */
+    function underText(x, y) {
+      return (x > AX + GAP - 40 && x < AX + GAP + 760 && y > BASE - 380 && y < BASE + 30) ||
+        (x > AX + GAP - 40 && x < AX + GAP + 860 && y > BASE + 40 && y < BASE + 135) ||
+        (x > AX - GAP - 520 && x < AX - GAP + 40 && y > BASE - 75 && y < BASE + 30);
+    }
+    lay().eggs.forEach(function (e) {
+      var ea = ga * ease((tt - 19.2 - 1.0 * e.ord) / .6) * (underText(e.x, e.y + dy) ? 1 - quiet : 1); if (ea <= .002) return;
+      ctx.globalAlpha = ea * .35; ctx.fillStyle = COL.egg; E.rr(ctx, e.x - e.w / 2 - 7, e.y + dy - 8, e.w + 14, 16, 8); ctx.fill();
+      ctx.globalAlpha = ea; ctx.fillStyle = COL.eggHi; E.rr(ctx, e.x - e.w / 2, e.y + dy - 3.5, e.w, 7, 3.5); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  /* ---------- rows of the last subdivision: caption in the role column, number in the name column ---------- */
+  var ROWS = [
+    { a: 12.2, b: 19.0, cap: 'Имен в титрах', num: D.names, sub: 'Каждое — на экране больше ' + D.shows + ' раз' },
+    { a: 21.8, b: 28.0, cap: 'Пасхалок нашли', num: D.eggs, sub: 'Коды принимаем до конца дня' },
+    { a: 28.6, b: 34.9, cap: 'Спасибо от коллег', num: D.thanks, sub: 'И с ними больше ' + D.coins + ' коинов' }
+  ];
+  function rows(ctx, tt) {
+    ROWS.forEach(function (rw) {
+      if (tt < rw.a || tt > rw.b) return;
+      var i = ease((tt - rw.a) / 1.0), o = ease((tt - (rw.b - 1.0)) / 1.0), dy = 200 * (1 - i) - 200 * o;   // a row glides in like a tape row
+      var a = Math.min(ease((tt - rw.a) / .8), 1 - ease((tt - (rw.b - .8)) / .8));
+      if (a <= 0) return;
+      text(ctx, rw.num, AX + GAP, BASE + dy, '900 ' + NF + 'px ' + FD, 'left', a);
+      text(ctx, rw.cap, AX - GAP, BASE + dy, '600 60px ' + FB, 'right', a * .75);
+      text(ctx, rw.sub, AX + GAP + 6, BASE + 105 + dy, '500 54px ' + FB, 'left', a * ease((tt - rw.a - .3) / .8) * .82);
+    });
+  }
+  function pairsWall(ctx, tt) {
+    var a = win(tt, 28.0, 35.2, .8, .8) * .08; if (a <= 0) return;
+    ctx.globalAlpha = a; E.drawLoop(ctx, pairsSprite(), 300 + 60 * (tt - 28)); ctx.globalAlpha = 1;
+  }
+  /* the last thanks of the holiday, in the format of the «Особая благодарность» block */
+  function finalCard(ctx, tt) {
+    var a = win(tt, 35.0, 42.7, .8, .7); if (a <= 0) return;
+    var dy = 140 * (1 - ease((tt - 35.0) / 1.2));
+    E.rr(ctx, 230, 250 + dy, 1460, 580, 14); ctx.globalAlpha = a * .05; ctx.fillStyle = COL.fg; ctx.fill();
+    ctx.globalAlpha = a * .4; ctx.strokeStyle = COL.fg; ctx.lineWidth = 3; ctx.stroke(); ctx.globalAlpha = 1;
+    var ta = win(tt, 35.4, 42.7, .8, .7);
+    text(ctx, 'Особая благодарность', 960, 352 + dy, '600 50px ' + FB, 'center', a * .6);
+    text(ctx, 'Без тебя титры были бы', 960, 502 + dy, '700 96px ' + FB, 'center', ta);
+    text(ctx, 'на одну строку короче', 960, 618 + dy, '700 96px ' + FB, 'center', ta);
+    text(ctx, 'Все ' + D.names + ' → каждому', 960, 748 + dy, '500 60px ' + FB, 'center', win(tt, 36.0, 42.7, .8, .7) * .82);
+  }
+  /* after-frame: a card from everyone to each, until the end of the day */
+  function endFrame(ctx, tt) {
+    var a = win(tt, 42.7, 1e9, .9, 0); if (a <= 0) return;
+    ctx.globalAlpha = .06 * a; ctx.drawImage(mapSprite().c, 0, 30 - 3 * (tt - VIDEO_END), 1920, 1080); ctx.globalAlpha = 1;
+    E.lockup(ctx, 960, 84, a);
+    text(ctx, 'С главным банковским днем!', 960, 500, '900 132px ' + FD, 'center', a);
+    text(ctx, 'Все ' + D.names + ' → каждому', 960, 612, '500 60px ' + FB, 'center', a * .82);
+    text(ctx, DATES, 80, 922, '500 44px ' + FB, 'left', a * .6);
+    E.drawQR(ctx, 1660, 800, 170, a);
+    text(ctx, 'Введи код пасхалки', 1610, 868, '500 44px ' + FB, 'right', a * .85);
+    text(ctx, 'на сайте праздника', 1610, 922, '500 44px ' + FB, 'right', a * .85);
+  }
+
+  function draw(ctx, k, tt) {
+    var off = E.tapeOffset(tt);
+    mapSprite(); pairsSprite();   // build the heavy static art on the first frame, not in the middle of the zoom
+    tapeCam(ctx, tt, off);
+    drawMap(ctx, tt);
+    drawEggs(ctx, tt);
+    header(ctx, tt);
+    text(ctx, 'Каждая черта — чья-то строка в титрах', 960, 915, '500 54px ' + FB, 'center', win(tt, 7.2, 12.3, .8, .6) * .85);
+    pairsWall(ctx, tt);
+    rows(ctx, tt);
+    finalCard(ctx, tt);
+    E.corner(ctx, tt, off, { switchAt: .9, after: 'Данные на ' + D.dataTime + ' по Москве', until: VIDEO_END });
+    endFrame(ctx, tt);
+  }
+
+  registerConcept({
+    id: 'everyperson',
+    arch: 'Обычный человек',
+    name: 'Карта круга',
+    idea: 'Итоги идут как последнее подразделение титров: подпись стоит на месте должности, цифра на месте имени, все цифры одного размера. Главный кадр: карта круга, вся лента в одном кадре, ' + D.names + ' тонких черт, и на своих местах горят ' + D.eggKinds + ' пасхалок. В конце спасибо от всех каждому: «Без тебя титры были бы на одну строку короче».',
+    strong: 'Лучший голос без CEO: благодарят не сверху, а все каждого. Карта круга это настоящая инфографика из данных ленты, такой картинки в проекте больше нет.',
+    risk: 'Карте круга нужен скрипт от разработки, которого нет в плане. Тонкие черты на офисных телевизорах могут дрожать после сжатия: запасной вид с толстыми чертами и меньшим числом колонок готовим заранее.',
+    take: 'Голос последней карточки: подпись «Все ' + D.names + ' → каждому».',
+    how: [
+      { h: 'Цифра на месте имени', p: 'Итоги идут как еще одно подразделение ленты. Подпись стоит в колонке должности, число в колонке имени, все числа одного размера: главной цифры нет.' },
+      { h: 'Карта круга', p: 'Камера отъезжает от заголовка, и весь круг ленты встает в один кадр: ' + D.names + ' черт разной длины, у каждой своя строка. На этой же карте загораются пасхалки, там, где они стояли.' },
+      { h: 'Спасибо от всех каждому', p: 'Последняя карточка оформлена как «Особая благодарность» из ленты. Фраза считает до единицы, до зрителя, а подпись идет от всех сотрудников.' }
+    ],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: 10,
+    scenes: [
+      { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно, в полную яркость. Ролик начинается прямо из нее, без заставки.' },
+      { a: 0, b: 4, rep: 2.8, title: 'Новое подразделение', time: '0:00–0:04', screen: ['Угол: «Данные на ' + D.dataTime + ' по Москве»', 'Итоги трех дней'], text: 'Лента за секунду гаснет до 15%, снизу поднимается заголовок в стиле подразделения: как будто в титрах началось еще одно. В углу вместо подразделения время данных.' },
+      { a: 4, b: 12, rep: 10, title: 'Весь круг', time: '0:04–0:12', screen: ['Каждая черта — чья-то строка в титрах'], text: 'Один большой жест: камера отъезжает от заголовка, лента сжимается в колонку, вокруг встает весь круг. ' + D.names + ' черт разной длины, видны разрывы между подразделениями и блоки «Особой благодарности».' },
+      { a: 12, b: 19, rep: 15.5, title: 'Имена', time: '0:12–0:19', screen: ['Имен в титрах', D.names, 'Каждое — на экране больше ' + D.shows + ' раз'], text: 'Карта гаснет до фона, снизу въезжает строка итога: подпись в колонке должности, число в колонке имени. Все три числа одного кегля, главной цифры нет.' },
+      { a: 19, b: 28, rep: 25, title: 'Пасхалки', time: '0:19–0:28', screen: ['Пасхалок нашли', D.eggs, 'Коды принимаем до конца дня'], text: 'Сначала на карте загораются ' + D.eggKinds + ' отметок цвета плашки, там, где пасхалки стояли в ленте. Горят все одинаково: показываем, где прятали, а не какие нашли. Потом строка с числом.' },
+      { a: 28, b: 35, rep: 31.5, title: 'Спасибо', time: '0:28–0:35', screen: ['Спасибо от коллег', D.thanks, 'И с ними больше ' + D.coins + ' коинов'], text: 'Карта уходит вверх, как подразделение в ленте. За строкой едва видны пары «автор → адресат»: каждое спасибо сказал кто-то конкретный кому-то конкретному.' },
+      { a: 35, b: 43, rep: 39, title: 'От всех каждому', time: '0:35–0:43', screen: ['Особая благодарность', 'Без тебя титры были бы / на одну строку короче', 'Все ' + D.names + ' → каждому'], text: 'Последнее спасибо праздника в формате блока, который три дня шел после каждого подразделения. Фраза считает до единицы, до зрителя. Подпись от всех сотрудников, без начальника.' },
+      { a: 43, b: 51, rep: 47, title: 'После-кадр', time: '0:43 и до конца дня', screen: ['С главным банковским днем!', 'Все ' + D.names + ' → каждому', DATES, 'Введи код пасхалки / на сайте праздника'], text: 'Открытка от всех каждому стоит до конца дня. Чистая типографика, за ней на 6% медленно плывет карта круга. Цифр банка нет: к вечеру они устарели бы, а число имен не меняется.' }
+    ],
+    draw: draw
+  });
+})();
+
+/* ---- 02_matchmaker.js ---- */
+/* Сваха: «Стрелка спасибо». Один знак на весь ролик: стрелка из строки спасибо «автор → адресат». */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, FD = E.FD, COL = E.COL, win = E.win, text = E.text, ease = E.ease, lerp = E.lerp, clamp = E.clamp;
+  var VIDEO_END = 43, TEND = 51;
+  var NS = ' ';                              // narrow no-break space around the en dash in date ranges
+  var DATES = '2' + NS + '–' + NS + '4 декабря';
+  var HEAD = 'Итоги трех дней · ' + DATES;
+  var DATES_Y = DATES + ' 2026';
+
+  /* one row = number above the arrow, sides at its ends, label under it. Logical px. */
+  var AX = 960, GAP = 260, AL = AX - GAP + 40, AR = AX + GAP - 40;   // sides anchored at 700 / 1220, arrow 740..1180
+  var NUMH = 380, NB = 200 + NUMH;                                   // digits 35% of the frame, top at 200
+  var SB = 712, AY = SB - 27, LY = 836;                              // sides baseline, arrow line, label baseline
+  var SIDE = '700 86px ' + FB, LAB = '500 58px ' + FB, PLATE = '600 56px ' + FB;
+  var LW = 10, HS = 40;                                              // arrow stroke and head
+  var PY = 540, UP = 140;                                            // arrow line in the phrase, lift for the end frame
+
+  var ROWS = [
+    { a: 4, b: 11, l: 'Титры', r: 'каждому', num: D.names, lab: 'Имена в титрах' },
+    { a: 11, b: 18, l: 'Титры', r: 'внимательным', num: D.eggs, lab: 'Находки пасхалок: счет еще идет', plate: true }
+  ];
+  var MINI = ['Имена в титрах: ' + D.names, 'Находки пасхалок: ' + D.eggs];
+  var THX_LAB = 'Спасибо — и с ними больше ' + D.coins + ' коинов';
+  var DATA = 'Данные на ' + D.dataTime + ' по Москве';
+  var L1 = 'Весь банк на хорошем счету', L2 = 'Друг у друга';
+
+  /* 24 lines «автор → адресат» in the tape format: 12 from the tape, 12 more of the same kind */
+  var LINES = (function () {
+    var p = E.personMaker(57), out = [];
+    for (var i = 0; i < 12; i++) { out.push(E.PAIRS[i]); out.push(p() + ' → ' + (i === 4 ? 'вся команда' : p())); }
+    return out.map(function (s) { return { s: s, l: s.slice(0, s.indexOf(' → ')) }; });
+  })();
+  /* two columns of names for the turn: everyone on the left, everyone on the right */
+  function names(seed, n) { var p = E.personMaker(seed), a = []; for (var i = 0; i < n; i++) a.push(p()); return a; }
+  var COLL = names(131, 40), COLR = names(313, 40);
+
+  var MS = 18, TM = 22.95;                                           // merge starts, merged arrow takes over
+  var LF = '600 32px ' + FB, LP = 36, LY0 = 171;                     // merge lines: font, pitch, first baseline
+
+  /* vector arrow: p = drawn share from the left, back = size of the second head 0..1 */
+  function arrow(ctx, x0, x1, y, lw, hs, a, p, back) {
+    if (!(a > 0) || !(p > 0)) return;
+    var tip = x0 + (x1 - x0) * p, h = Math.min(hs, (tip - x0) * .9), cx = .77, sy = .64, hb = hs * (back || 0);
+    ctx.save(); ctx.globalAlpha = Math.min(1, a); ctx.strokeStyle = COL.fg; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(tip, y);
+    if (h > .5) { ctx.moveTo(tip - h * cx, y - h * sy); ctx.lineTo(tip, y); ctx.lineTo(tip - h * cx, y + h * sy); }
+    if (hb > .5) { ctx.moveTo(x0 + hb * cx, y - hb * sy); ctx.lineTo(x0, y); ctx.lineTo(x0 + hb * cx, y + hb * sy); }
+    ctx.stroke(); ctx.restore();
+  }
+  function bigNum(ctx, s, x, y, a) { text(ctx, s, x, y, '900 ' + Math.round(NUMH / E.digitH(1)) + 'px ' + FD, 'center', a); }
+  function label(ctx, s, y, a, plate) {
+    if (!(a > 0)) return;
+    if (!plate) { text(ctx, s, AX, y, LAB, 'center', a * .85); return; }
+    ctx.font = PLATE; var w = ctx.measureText(s).width + 84;
+    ctx.save(); ctx.globalAlpha = Math.min(1, a); ctx.fillStyle = COL.egg; E.rr(ctx, AX - w / 2, y - 55, w, 78, 12); ctx.fill(); ctx.restore();
+    text(ctx, s, AX, y, PLATE, 'center', a, '#FFFFFF');
+  }
+
+  /* 0:00 the tape dims, a header in the style of a subdivision rises like the next block */
+  function header(ctx, tt) {
+    var a = win(tt, .7, 4, .7, .7); if (a <= 0) return;
+    var u = clamp((tt - .7) / 1, 0, 1), dy = 240 * Math.pow(1 - u, 3) - 80 * ease((tt - 3.3) / .7);
+    text(ctx, HEAD, AX, 560 + dy, '700 80px ' + FB, 'center', a);
+  }
+  /* a number row: sides rise, the arrow draws left to right, the number arrives along it, the label follows */
+  function row(ctx, tt, R) {
+    if (tt < R.a || tt > R.b) return;
+    var t = tt - R.a;
+    var pS = ease(t / .6), pA = clamp((t - .4) / .8, 0, 1), pN = ease((t - 1) / .6), pL = ease((t - 1.4) / .5);
+    var pX = ease((tt - (R.b - .7)) / .7), o = 1 - pX, dy = 110 * (1 - pS) - 80 * pX;
+    text(ctx, R.l, AX - GAP, SB + dy, SIDE, 'right', pS * o);
+    text(ctx, R.r, AX + GAP, SB + dy, E.fitFont(ctx, R.r, '700', FB, 86, 1920 - 100 - AX - GAP), 'left', pS * o);
+    arrow(ctx, AL, AR, AY + dy, LW, HS, o, pA, 0);
+    bigNum(ctx, R.num, AX - 220 * (1 - pN), NB + dy, pN * o);
+    label(ctx, R.lab, LY + dy, pL * o, R.plate);
+  }
+  /* finished rows stay as a pale line at the top edge */
+  function minis(ctx, tt) {
+    var o = 1 - ease((tt - 30) / .6); if (o <= 0) return;
+    var f = '500 30px ' + FB; ctx.font = f;
+    var sep = 72, w0 = ctx.measureText(MINI[0]).width, w1 = ctx.measureText(MINI[1]).width, x = AX - (w0 + sep + w1) / 2;
+    var a0 = win(tt, 10.4, 1e9, .6, 0) * o * .5, a1 = win(tt, 17.4, 1e9, .6, 0) * o * .5;
+    text(ctx, MINI[0], x, 88, f, 'left', a0);
+    text(ctx, '·', x + w0 + sep / 2, 88, f, 'center', a1);
+    text(ctx, MINI[1], x + w0 + sep, 88, f, 'left', a1);
+  }
+  /* the peak: 24 real lines rise and stand for two seconds, names fade, the arrows slide together into one long arrow */
+  function merge(ctx, tt) {
+    if (tt < MS || tt >= TM) return;
+    var s = tt - MS, tau = s - 1;
+    var dist = s <= 1 ? 240 * s : s <= 1.4 ? 240 + 240 * (tau - tau * tau / .8) : 288, off = 288 - dist;   // twice the tape speed, soft stop in 0.4 s
+    var aIn = ease(s / .6), nameA = 1 - ease((tt - 21.3) / .6), vecA = ease((tt - 21.2) / .3);
+    ctx.font = LF; var gw = ctx.measureText('→').width;
+    for (var i = 0; i < LINES.length; i++) {
+      var y = LY0 + i * LP + off, m = clamp((y - 130) / 70, 0, 1) * clamp((1040 - y) / 70, 0, 1);
+      if (nameA > 0 && m > 0) { ctx.font = LF; var x = AX - ctx.measureText(LINES[i].l + ' ').width - gw / 2; text(ctx, LINES[i].s, x, y, LF, 'left', .92 * aIn * m * nameA); }
+      if (vecA > 0) {
+        var c = ease((tt - 21.8 - Math.abs(i - 11.5) * .01) / 1), hl = lerp(gw * .42, (AR - AL) / 2, c);
+        arrow(ctx, AX - hl, AX + hl, lerp(y - 10, AY, c), lerp(3, 6, c), lerp(6, 20, c), vecA * lerp(m, 1, c), 1, 0);   // thicken as they travel, visible from afar
+      }
+    }
+  }
+  /* the merged arrow lives to the end: grows a second head, moves to the middle, shrinks to a sign */
+  function mainArrow(ctx, tt) {
+    if (tt < TM) return;
+    var th = ease((tt - TM) / .5), mv = ease((tt - 30.2) / 1), up = ease((tt - VIDEO_END) / 1), sh = ease((tt - 36.6) / .8), back = ease((tt - 30.8) / .8);
+    var hl = lerp((AR - AL) / 2, 120, sh);
+    arrow(ctx, AX - hl, AX + hl, lerp(AY, PY, mv) - UP * up, lerp(6, LW, th), lerp(20, HS, th), 1, 1, back);
+  }
+  function thanks(ctx, tt) {
+    if (tt < 23 || tt > 33.5) return;
+    var pS = ease((tt - 23) / .6), sx = 50 * (1 - pS);
+    var mv = ease((tt - 30.2) / 1), sideO = 1 - ease((tt - 32.9) / .5), ys = SB + (PY - AY) * mv;   // «Коллега ↔ коллеге» holds 31.6–32.9, then gives way to the columns
+    text(ctx, 'Коллега', AX - GAP - sx, ys, SIDE, 'right', pS * sideO);
+    text(ctx, 'коллеге', AX + GAP + sx, ys, SIDE, 'left', pS * sideO);
+    var o = 1 - ease((tt - 30) / .6), dy = -40 * ease((tt - 30) / .6), pN = ease((tt - 23.5) / .6), pL = ease((tt - 24) / .5);
+    bigNum(ctx, D.thanks, AX - 220 * (1 - pN), NB + dy, pN * o);
+    label(ctx, THX_LAB, LY + dy, pL * o, false);
+  }
+  /* the turn: the words dissolve into two columns of names that slide past each other. Names come to the front:
+     48 px, and each pair that passes the arrow lights up, so for a moment it reads as one line «имя ↔ имя» */
+  function columns(ctx, tt) {
+    var a = win(tt, 33.2, 37.2, .8, .7); if (a <= 0) return;
+    var f = '600 48px ' + FB, P = 64, H = COLL.length * P, sc = 70 * (tt - 33.2), yb = PY + 17;
+    function vis(y) { return clamp((y - 170) / 120, 0, 1) * clamp((930 - y) / 120, 0, 1) * (.5 + .5 * ease(1 - Math.abs(y - yb) / 120)); }
+    for (var i = 0; i < COLL.length; i++) {
+      var yl = (((i * P - sc) % H) + H) % H + 120, yr = (((i * P + sc) % H) + H) % H + 120, ml = vis(yl), mr = vis(yr);
+      if (ml > 0) text(ctx, COLL[i], AX - GAP, yl, f, 'right', a * ml);
+      if (mr > 0) text(ctx, COLR[i], AX + GAP, yr, f, 'left', a * mr);
+    }
+  }
+  function phrase(ctx, tt) {
+    if (tt < 37.3) return;
+    var up = ease((tt - VIDEO_END) / 1), a1 = ease((tt - 37.3) / .7), a2 = ease((tt - 38.9) / .7), f = '900 120px ' + FD;
+    text(ctx, L1, AX, 440 - UP * up + 24 * (1 - a1), f, 'center', a1);
+    text(ctx, L2, AX, 700 - UP * up + 24 * (1 - a2), f, 'center', a2);
+  }
+  function endFrame(ctx, tt) {
+    var a = win(tt, VIDEO_END + .5, 1e9, .8, 0); if (a <= 0) return;
+    var b = win(tt, VIDEO_END + .8, 1e9, .8, 0);
+    E.lockup(ctx, 960, 70, a);
+    text(ctx, 'С главным банковским днем!', AX, 712, '600 64px ' + FB, 'center', a);
+    text(ctx, DATES_Y, AX, 790, '500 46px ' + FB, 'center', b * .7);
+    E.drawQR(ctx, 1660, 810, 170, b);
+    text(ctx, 'Введи код пасхалки', 1610, 884, '500 44px ' + FB, 'right', b * .85);
+    text(ctx, 'на сайте праздника', 1610, 938, '500 44px ' + FB, 'right', b * .85);
+  }
+
+  function draw(ctx, k, tt) {
+    var off = E.tapeOffset(tt);
+    var ta = tt < .3 ? 1 : tt < 1.3 ? 1 - .89 * ease((tt - .3) / 1) : tt < 3.4 ? .11 : .11 * (1 - ease((tt - 3.4) / 1));
+    E.drawTape(ctx, off, ta);
+    E.corner(ctx, tt, off, { switchAt: .9, after: '' });
+    header(ctx, tt);
+    text(ctx, DATA, 80, 1015, '500 30px ' + FB, 'left', win(tt, 4, 30.6, .6, .6) * .6);
+    minis(ctx, tt);
+    ROWS.forEach(function (R) { row(ctx, tt, R); });
+    merge(ctx, tt);
+    thanks(ctx, tt);
+    columns(ctx, tt);
+    mainArrow(ctx, tt);
+    phrase(ctx, tt);
+    endFrame(ctx, tt);
+  }
+
+  registerConcept({
+    id: 'matchmaker',
+    arch: 'Сваха',
+    name: 'Стрелка спасибо',
+    idea: 'Один знак на весь ролик: стрелка из строки спасибо «автор → адресат». Каждое число стоит на стрелке с крупными подписями «кто» и «кому», на пике 24 настоящие строки спасибо сливаются в одну стрелку. В конце стрелка становится двусторонней, связывает две колонки имен и дописывает строку заставки: «Весь банк на хорошем счету. Друг у друга».',
+    strong: 'Самый необычный знак в наборе и развязка платформы «На хорошем счету». У числа на стрелке нет шкалы и цели, поэтому скромная цифра не выглядит недобором.',
+    risk: 'Стрелка рядом с коинами может прочитаться как денежный перевод. В связке видны настоящие имена: нужен ответ юристов и внутрикома, без связки ролик короче на 5 секунд.',
+    take: 'Запасной образ для кадра спасибо, если окно в ленту не прочитается на телевизоре.',
+    how: [
+      { h: 'Число на стрелке', p: 'Стрелка рисуется слева направо, по ней приезжает число, по краям крупно «кто» и «кому», под ней ярлык. Первая стрелка идет от титров, а не от банка, поэтому не звучит сверху.' },
+      { h: 'Много строк в одну', p: '24 настоящие строки «автор → адресат» поднимаются снизу и стоят две секунды. Потом имена гаснут, стрелки съезжаются и сливаются в одну, на ней встает число спасибо.' },
+      { h: 'Стрелка в обе стороны', p: 'На левом конце вырастает вторая головка, и стрелка связывает две крупные колонки имен: каждая пара, которая проходит мимо нее, на миг становится строкой «имя ↔ имя». Последнее слово за всеми: «Весь банк на хорошем счету. Друг у друга».' }
+    ],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: 26,
+    scenes: [
+      { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно. Последний блок «Особая благодарность» уходит вверх, прокрутка не останавливается.' },
+      { a: 0, b: 4, rep: 2.2, title: 'Заголовок', time: '0:00–0:04', screen: [HEAD], text: 'Лента за секунду гаснет, снизу поднимается заголовок в стиле подразделения, на месте города даты. Финал выглядит как последний блок ленты. Угол гаснет.' },
+      { a: 4, b: 11, rep: 8, title: 'Имена', time: '0:04–0:11', screen: ['Титры', 'каждому', D.names, 'Имена в титрах', 'Угол: «' + DATA + '»'], text: 'Пара встает в две колонки, как должность и имя. Между ними слева направо рисуется стрелка «Титры → каждому», по ней приезжает число. Стрелка идет от титров, а не от банка, а стороны набраны крупно, их видно издалека.' },
+      { a: 11, b: 18, rep: 15, title: 'Пасхалки', time: '0:11–0:18', screen: ['Титры', 'внимательным', D.eggs, 'Находки пасхалок: счет еще идет', MINI[0]], text: 'Строка с именами уходит вверх бледной мини-строкой, тем же движением въезжает «Титры → внимательным». Ярлык на плашке цвета пасхалки и честно говорит, что цифра не финальная.' },
+      { a: 18, b: 23, rep: 20.6, title: 'Связка', time: '0:18–0:23', screen: [LINES[0].s, LINES[2].s], text: 'Снизу вдвое быстрее ленты поднимаются 24 настоящие строки «автор → адресат», все стрелки на одной оси, и две секунды стоят: это имена коллег. Потом имена гаснут, стрелки съезжаются и сливаются в одну длинную. Самый сильный момент ролика.' },
+      { a: 23, b: 30, rep: 26.5, title: 'Спасибо', time: '0:23–0:30', screen: ['Коллега', 'коллеге', D.thanks, THX_LAB, MINI[0], MINI[1]], text: 'У концов слитой стрелки встают стороны «Коллега → коллеге», по стрелке приезжает число спасибо. Коины только в ярлыке, без знаков валюты. Вверху бледно итоги прошлых кадров.' },
+      { a: 30, b: 37, rep: 35.2, title: 'Поворот', time: '0:30–0:37', screen: ['Коллега', 'коллеге'], text: 'Цифры гаснут, на левом конце стрелки вырастает вторая головка, полторы секунды стоит «Коллега ↔ коллеге». Слова растворяются в две крупные колонки имен, колонки едут навстречу друг другу, и каждая пара у стрелки на миг загорается. Имена возвращаются на первый план.' },
+      { a: 37, b: 43, rep: 41, title: 'Фраза', time: '0:37–0:43', screen: [L1, L2], text: 'Колонки гаснут, стрелка сжимается до знака. Над ней строка, которую три дня показывала заставка между кругами, через секунду под ней окончание. Говорит не банк, а сама стрелка.' },
+      { a: 43, b: 51, rep: 47, title: 'Последний кадр', time: '0:43 и до конца дня', screen: [L1, L2, 'С главным банковским днем!', DATES_Y, 'Введи код пасхалки', 'на сайте праздника'], text: 'Фраза поднимается, встают лок-ап, поздравление, даты и QR. Цифр нет, кадр рендерим заранее, он стоит до конца дня и понятен без ролика.' }
+    ],
+    draw: draw
+  });
+})();
+
+/* ---- 03_translator.js ---- */
+/* Переводчик: «Выписка с переводом». Итоги приходят строками банковской выписки, под каждой встает перевод на человеческий. */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, FD = E.FD, COL = E.COL, win = E.win, text = E.text, ease = E.ease, lerp = E.lerp;
+  var FM = 'ui-monospace,"SF Mono",Menlo,Consolas,monospace';
+  var NCH = 46;     // characters in one statement row: label, leader dots, amount
+  var MS = 58;      // mono size of a statement row
+  var RY = 560;     // baseline of a row when it stops, before the translation
+  var KS = .45;     // plus and kopecks size, share of the big number size
+  var DIM = .6;     // the bank layer after translation: the color of job titles in the tape
+  var MT = 1.6;     // one scroll step of the tape between rows, seconds
+  var MD = 480;     // one scroll step, px
+  var HOLD0 = .8;   // a row stands whole this long before it turns into number and translation
+
+  function mono(w, s) { return w + ' ' + s + 'px ' + FM; }
+  /* a statement row of exactly NCH characters: «LABEL ······ AMOUNT» */
+  function stmt(label, amt) { return label + ' ' + new Array(NCH - label.length - amt.length - 1).join('·') + ' ' + amt; }
+
+  /* rows in order; hold = seconds the tape stands while the row is read. Every full frame
+     (label, number, translation) stands 5 s before the tape moves on.
+     The bank layer loses one money mark per row: egg codes keep plus and kopecks (nobody takes codes
+     for money), thanks keep only the plus (thanks are counted, not paid), names have no sign at all. */
+  var HEAD = { hold: 6.8, label: 'ВЫПИСКА ЗА 2–4 ДЕКАБРЯ', amt: 'НА ' + D.dataTime + ' МСК', title: 'Итоги трех дней', sub: 'в переводе на человеческий' };
+  var NUMS = [
+    { hold: 7.5, label: 'ПРИНЯТО КОДОВ ПАСХАЛОК', pre: '+', num: D.eggs, suf: ',00', tr: 'Столько раз титры досмотрели до шуточной строки', dress: 'egg' },
+    { hold: 7.8, label: 'ВХОДЯЩИЕ СПАСИБО', pre: '+', num: D.thanks, suf: '', tr: 'Столько раз коллеги не прошли мимо', dress: 'thx' },
+    { hold: 7.3, label: 'ЗАЧИСЛЕНО В ТИТРЫ', pre: '', num: D.names, suf: '', tr: 'Каждый — по имени', dress: 'bold' }
+  ];
+  /* the last row has no number; under the word stands the tape's own «автор → адресат» line:
+     the thanks is the colleagues' word, not a payment from the bank */
+  var FIN = { hold: 7.6, word: 'СПАСИБО', human: 'Спасибо', who: 'Коллеги → коллегам' };
+  var END_ROWS = [['ПРИНЯТО КОДОВ ПАСХАЛОК', D.eggs], ['ВХОДЯЩИЕ СПАСИБО', D.thanks], ['ЗАЧИСЛЕНО В ТИТРЫ', D.names]];
+
+  HEAD.row = stmt(HEAD.label, HEAD.amt);
+  NUMS.forEach(function (r) { r.amt = r.pre + r.num + r.suf; r.row = stmt(r.label, r.amt); });
+
+  /* one scroll for the tape and the rows: stop and go. R = the row stops, X = the tape moves on */
+  var MOVES = [{ a: 0, b: MT, d: 420, v0: 120 }];   // at 0:00 the tape keeps its speed, then brings the header
+  var t = MT;
+  function r1(x) { return Math.round(x * 10) / 10; }
+  [HEAD].concat(NUMS, [FIN]).forEach(function (r) { r.R = t; r.X = r1(t + r.hold); MOVES.push({ a: r.X, b: r1(r.X + MT), d: MD }); t = r1(r.X + MT); });
+  var VIDEO_END = FIN.X, TEND = VIDEO_END + 8, END_R = VIDEO_END + MT;   // 45 and 53
+
+  function P(tt) {
+    var p = 0;
+    for (var i = 0; i < MOVES.length; i++) {
+      var m = MOVES[i]; if (tt <= m.a) break;
+      if (tt >= m.b) { p += m.d; continue; }
+      var T = m.b - m.a, s = (tt - m.a) / T;
+      p += m.d * (3 * s * s - 2 * s * s * s) + (m.v0 ? m.v0 * T * (s - 2 * s * s + s * s * s) : 0);
+    }
+    return p;
+  }
+  /* storyboard times: a scene starts when the previous row has faded out */
+  function tm(x) { var v = Math.round(x); return Math.floor(v / 60) + ':' + ('0' + v % 60).slice(-2); }
+  function span(a, b) { return tm(a) + '–' + tm(b); }
+  var SA = [0, 2, r1(HEAD.X + .6), r1(NUMS[0].X + .6), r1(NUMS[1].X + .6), r1(NUMS[2].X + .6), VIDEO_END, TEND];
+
+  /* vertical shift of a row: it rides in with the scroll, stands, rides out */
+  function sh(r, tt) { return P(r.R) - P(tt); }
+  function vis(r, tt) { return ease((tt - (r.R - .9)) / .8) * (1 - ease((tt - r.X) / .6)); }
+
+  /* big number layout: same height for every number, room for plus and kopecks around the digits */
+  function layout(ctx) {
+    var F = Math.round(.33 * 1080 / E.digitH(1)), half = 0;
+    NUMS.forEach(function (r) {
+      ctx.font = '900 ' + F + 'px ' + FD; var w = ctx.measureText(r.num).width / 2;
+      ctx.font = '900 ' + Math.round(F * KS) + 'px ' + FD;
+      half = Math.max(half, w + (r.pre ? F * .03 + ctx.measureText(r.pre).width : 0), w + (r.suf ? F * .01 + ctx.measureText(r.suf).width : 0));
+    });
+    if (half > 870) F = Math.floor(F * 870 / half);
+    var Hd = E.digitH(F), LY = 258, top = LY + 76, base = top + Hd;
+    return { F: F, Fk: Math.round(F * KS), Hd: Hd, LY: LY, top: top, base: base, TY: base + 122 };
+  }
+
+  function bigNum(ctx, L, r, ax, ay, s, a, kA) {
+    if (a <= 0) return;
+    var fN = '900 ' + L.F + 'px ' + FD, fK = '900 ' + L.Fk + 'px ' + FD;
+    ctx.save(); ctx.translate(ax, ay); ctx.scale(s, s);
+    text(ctx, r.num, 0, 0, fN, 'center', a);
+    if (kA > 0) {
+      ctx.font = fN; var hw = ctx.measureText(r.num).width / 2;
+      if (r.pre) text(ctx, r.pre, -hw - L.F * .03, -L.Hd / 2 + L.Fk * .33, fK, 'right', a * kA);
+      if (r.suf) text(ctx, r.suf, hw + L.F * .01, 0, fK, 'left', a * kA);
+    }
+    ctx.restore();
+  }
+
+  function drawHead(ctx, tt, L) {
+    var r = HEAD, a = vis(r, tt); if (a <= 0) return;
+    var dy = sh(r, tt), e = ease((tt - (r.R + .6)) / .8);
+    text(ctx, r.row, 960, lerp(RY, L.LY, e) + dy, mono(500, MS), 'center', a * lerp(1, DIM, e));
+    var fT = E.fitFont(ctx, r.title, 900, FD, 220, 1500), cap = E.digitH(parseFloat(/(\d+)px/.exec(fT)[1]));
+    var yT = L.top + (L.Hd + cap) / 2;
+    var t1 = ease((tt - (r.R + 1.0)) / .6), t2 = ease((tt - (r.R + 1.3)) / .5);
+    text(ctx, r.title, 960, yT + 40 * (1 - t1) + dy, fT, 'center', a * t1);
+    text(ctx, r.sub, 960, yT + 118 + 30 * (1 - t2) + dy, '600 62px ' + FB, 'center', a * t2);
+  }
+
+  function drawNum(ctx, tt, r, L) {
+    var a = vis(r, tt); if (a <= 0) return;
+    var dy = sh(r, tt), fM = mono(r.dress === 'bold' ? 700 : 500, MS);
+    ctx.font = fM; var wF = ctx.measureText(r.row).width, wL = ctx.measureText(r.label).width, wLs = ctx.measureText(r.label + ' ').width;
+    var left = 960 - wF / 2, right = 960 + wF / 2, cw = wF / r.row.length;
+    // the label leaves first, the amount starts growing a moment later: they never cross
+    var e = ease((tt - (r.R + HOLD0)) / .7), g = ease((tt - (r.R + HOLD0 + .15)) / .8);
+    var egg = r.dress === 'egg', lc = egg ? '#FFFFFF' : COL.fg;
+    var ly = lerp(RY, L.LY, e) + dy;
+    // dressing from the tape: egg plate, or the frame of «Особая благодарность»; it shrinks with the label
+    var bx = lerp(left - 32, 960 - wL / 2 - 32, e), bw = lerp(wF + 64, wL + 64, e);
+    if (egg) { ctx.globalAlpha = a; ctx.fillStyle = COL.egg; E.rr(ctx, bx, ly - 60, bw, 86, 10); ctx.fill(); ctx.globalAlpha = 1; }
+    if (r.dress === 'thx') { ctx.globalAlpha = a * .45; ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; E.rr(ctx, bx, ly - 66, bw, 98, 10); ctx.stroke(); ctx.globalAlpha = 1; }
+    if (e <= 0) { text(ctx, r.row, left, RY + dy, fM, 'left', a, lc); }
+    else {
+      text(ctx, r.label, lerp(left, 960 - wL / 2, e), ly, fM, 'left', a * (egg ? 1 : lerp(1, DIM, e)), lc);
+      var dA = 1 - ease(e / .25); if (dA > 0) text(ctx, r.row.slice(r.label.length + 1, r.row.length - r.amt.length - 1), left + wLs, RY + dy, fM, 'left', a * dA, lc);
+      var mA = 1 - ease(g / .15); if (mA > 0) text(ctx, r.amt, right, RY + dy, fM, 'right', a * mA, lc);
+      // the amount grows into the big number; plus and kopecks fade out after it stops
+      var s0 = .7 * MS / L.Hd, ax0 = right - cw * (r.suf.length + r.num.length / 2);
+      var kA = 1 - ease((tt - (r.R + HOLD0 + .95)) / .45);
+      if (g > 0) bigNum(ctx, L, r, lerp(ax0, 960, g), lerp(RY, L.base, g) + dy, lerp(s0, 1, g), a * ease(g / .2), kA);
+    }
+    var tA = ease((tt - (r.R + HOLD0 + (r.pre || r.suf ? 1.15 : .95))) / .5);
+    if (tA > 0) text(ctx, r.tr, 960, L.TY + 36 * (1 - tA) + dy, E.fitFont(ctx, r.tr, 600, FB, 62, 1640), 'center', a * tA);
+  }
+
+  function drawFin(ctx, tt, L) {
+    var r = FIN, a = vis(r, tt); if (a <= 0) return;
+    var dy = sh(r, tt), e = ease((tt - (r.R + HOLD0)) / .8), b = ease((tt - (r.R + 2.2)) / .8);
+    // the bank word dims like every label, then lights up to full white: both languages say the same
+    text(ctx, r.word, 960, lerp(RY, L.LY, e) + dy, mono(500, Math.round(lerp(MS, 72, b))), 'center', a * (lerp(1, DIM, e) + (1 - DIM) * b));
+    // where a number would grow, the word rises instead, a bit smaller than the numbers
+    var w = ease((tt - (r.R + 1.4)) / .7);
+    if (w > 0) text(ctx, r.human, 960, L.base + 50 * (1 - w) + dy, E.fitFont(ctx, r.human, 900, FD, Math.round(L.F * .82), 1500), 'center', a * w);
+    // in the translation slot: the tape's «автор → адресат» line, so the word belongs to colleagues, not to the bank
+    var wa = ease((tt - (r.R + 2.6)) / .6);
+    if (wa > 0) text(ctx, r.who, 960, L.TY + 36 * (1 - wa) + dy, '600 62px ' + FB, 'center', a * wa);
+  }
+
+  function drawEnd(ctx, tt) {
+    var a = ease((tt - (VIDEO_END + .7)) / .8); if (a <= 0) return;
+    // rides in with the last scroll step, then drifts a few px so the screen does not burn in
+    var dy = P(END_R) - P(tt) + (tt > END_R ? 3 * Math.sin((tt - END_R) * Math.PI / 15) : 0);
+    var TL = 320, TR = 1600, fL = mono(500, 44), fN = '900 108px ' + FD;
+    E.lockup(ctx, 960, 64 + dy, a);
+    text(ctx, 'С главным банковским днем!', 960, 296 + dy, '900 116px ' + FD, 'center', a);
+    END_ROWS.forEach(function (rw, i) {
+      var y = 444 + i * 122 + dy;
+      ctx.font = fL; var lw = ctx.measureText(rw[0]).width, dw = ctx.measureText('·').width;
+      ctx.font = fN; var nw = ctx.measureText(rw[1]).width;
+      var n = Math.max(0, Math.floor((TR - nw - 30 - (TL + lw + 24)) / dw));
+      text(ctx, rw[0], TL, y, fL, 'left', a * .62);
+      text(ctx, new Array(n + 1).join('·'), TL + lw + 24, y, fL, 'left', a * .3);
+      text(ctx, rw[1], TR, y, fN, 'right', a);
+    });
+    ctx.globalAlpha = a * .25; ctx.fillStyle = COL.fg; ctx.fillRect(TL, 734 + dy, TR - TL, 2); ctx.globalAlpha = 1;
+    text(ctx, 'Данные на ' + D.dataTime + ' по Москве', TL, 800 + dy, '500 30px ' + FB, 'left', a * .55);
+    E.drawQR(ctx, 1660, 836 + dy, 156, a);
+    text(ctx, 'Введи код пасхалки', 1620, 908 + dy, '500 34px ' + FB, 'right', a * .85);
+    text(ctx, 'на сайте праздника', 1620, 952 + dy, '500 34px ' + FB, 'right', a * .85);
+  }
+
+  function tapeA(tt) {
+    if (tt < 0) return 1;
+    return (1 - .92 * ease(tt / .8))                      // signal: the tape almost goes out within a second
+      * (1 - .5 * ease((tt - (FIN.R - MT)) / 1.2))       // quieter under the last word
+      * (1 - ease((tt - VIDEO_END) / 1));                 // gone under the final statement
+  }
+
+  function draw(ctx, k, tt) {
+    var L = layout(ctx);
+    var off = tt < 0 ? E.tapeOffset(tt) : E.tapeOffset(0) + P(tt);
+    E.drawTape(ctx, off, tapeA(tt));
+    var pb = win(tt, VIDEO_END + .6, 1e9, .8, 0); if (pb > 0) { ctx.globalAlpha = .06 * pb; E.drawLoop(ctx, E.S.names, 700 + 6 * (tt - VIDEO_END)); ctx.globalAlpha = 1; }
+    E.corner(ctx, tt, off, { switchAt: .9, until: VIDEO_END });
+    drawHead(ctx, tt, L);
+    NUMS.forEach(function (r) { drawNum(ctx, tt, r, L); });
+    drawFin(ctx, tt, L);
+    drawEnd(ctx, tt);
+  }
+
+  registerConcept({
+    id: 'translator',
+    arch: 'Переводчик',
+    name: 'Выписка с переводом',
+    idea: 'Итоги приходят строками банковской выписки: «ВХОДЯЩИЕ СПАСИБО ···· +' + D.thanks + '». Число вырастает на весь экран, банковские знаки гаснут, а снизу, как субтитры, встает перевод на человеческий: «Столько раз коллеги не прошли мимо». В последней строке оба языка совпадают в одном слове: «Спасибо».',
+    strong: 'Самый простой шаблон: все строки устроены одинаково, любую можно выключить без переделки остальных. Подписи считают поступки людей, поэтому скромная цифра не выглядит недобором.',
+    risk: 'У спасибо остается банковский плюс, и циник все равно может услышать «спасибо вместо премии»: если внутриком против, строка идет без знака, как имена. Два слоя текста прохожему могут быть лишними, поэтому банковская строка только дополняет число и перевод.',
+    take: 'Принцип подписей: считаем поступки, а не операции. Подпись в форме «Столько раз…» не зависит от размера цифры.',
+    how: [
+      { h: 'Строка выписки', p: 'Каждое число въезжает с лентой строкой выписки: прописные, отточие, знак. Строки одеты в элементы ленты: пасхалки на фиолетовой плашке, спасибо в рамке «Особой благодарности», имена жирным, как заголовок подразделения.' },
+      { h: 'Перевод под строкой', p: 'Число вырастает на весь экран, банковские знаки гаснут, снизу поднимается перевод про поступки людей. Деньги уходят из выписки строка за строкой: плюс и копейки есть только у пасхалок, у спасибо один плюс, у имен знака нет.' },
+      { h: 'Одно слово на двух языках', p: 'Последняя строка без числа: сверху банковское «СПАСИБО», на месте числа человеческое «Спасибо». Под ним строка из ленты «Коллеги → коллегам»: это слово сотрудников друг другу, а не выплата от банка.' }
+    ],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: r1(NUMS[1].X - 1),
+    scenes: [
+      { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно. Склейки не будет: ролик продолжает ту же прокрутку.' },
+      { a: SA[1] - 2, b: SA[1], rep: 1.5, title: 'Сигнал', time: span(0, SA[1]), screen: ['Угол: «Итоги трех дней»', HEAD.row], text: 'Лента за секунду почти гаснет и делает один длинный шаг вверх: вместо следующего подразделения снизу въезжает шапка выписки. Перемену видно с 10 метров.' },
+      { a: SA[1], b: SA[2], rep: r1(HEAD.X - 1), title: 'Шапка выписки', time: span(SA[1], SA[2]), screen: [HEAD.row, HEAD.title, HEAD.sub], text: 'Лента встает, строка выписки уходит наверх и тускнеет до цвета должностей, под ней встает перевод. Прием понятен с первой строки: сверху язык банка, снизу человеческий.' },
+      { a: SA[2], b: SA[3], rep: r1(NUMS[0].X - 1), title: 'Пасхалки', time: span(SA[2], SA[3]), screen: [NUMS[0].row, D.eggs, NUMS[0].tr], text: 'Строка въезжает на фиолетовой плашке пасхалки, как в ленте. Сумма вырастает в число, плюс и копейки гаснут, снизу встает перевод: прием сначала видят на пасхалках, их никто не примет за деньги.' },
+      { a: SA[3], b: SA[4], rep: r1(NUMS[1].X - 1), title: 'Спасибо', time: span(SA[3], SA[4]), screen: [NUMS[1].row, D.thanks, NUMS[1].tr], text: 'Строка в рамке «Особой благодарности», копеек у нее нет: спасибо не деньги. Гаснет только плюс, перевод считает, сколько раз люди не прошли мимо, и это самая длинная пауза.' },
+      { a: SA[4], b: SA[5], rep: r1(NUMS[2].X - 1), title: 'Имена', time: span(SA[4], SA[5]), screen: [NUMS[2].row, D.names, NUMS[2].tr], text: 'Строка жирная, как заголовок подразделения, и без знака и копеек с самого начала: люди не суммы. Последняя цифра не зависит от активности.' },
+      { a: SA[5], b: VIDEO_END, rep: r1(VIDEO_END - 1), title: 'Одно слово', time: span(SA[5], VIDEO_END), screen: [FIN.word, FIN.human, FIN.who], text: 'Последняя строка без числа. На месте числа встает человеческое «Спасибо», банковское «СПАСИБО» над ним загорается в полную яркость, а снизу строка из ленты «Коллеги → коллегам»: это слово сотрудников друг другу, а не выплата от банка.' },
+      { a: VIDEO_END, b: TEND, rep: VIDEO_END + 4, title: 'Итоговая выписка', time: tm(VIDEO_END) + ' и до конца дня', screen: ['С главным банковским днем!', END_ROWS[0][0] + ': ' + D.eggs, END_ROWS[1][0] + ': ' + D.thanks, END_ROWS[2][0] + ': ' + D.names, 'Данные на ' + D.dataTime + ' по Москве', 'Введи код пасхалки / на сайте праздника'], text: 'Лента в последний раз сдвигается вверх и собирает строки в одну выписку. Чистая типографика, строки едва заметно смещаются, чтобы экран не выгорал, кадр стоит до конца дня.' }
+    ],
+    draw: draw
+  });
+})();
+
+/* ---- 04_pioneer.js ---- */
+/* Первопроходец: «Лента становится дорогой». Лента встает, ее разделительная линия поворачивает вправо
+   и становится дорогой. Цифры встают на нее отметками одного размера, последняя «1». Дальше пунктир. */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, FD = E.FD, COL = E.COL, win = E.win, text = E.text, ease = E.ease, lerp = E.lerp, clamp = E.clamp;
+  var VIDEO_END = 45, TEND = 53;
+  var TS = '\u2009';
+
+  /* ---------- the road ---------- */
+  var RY = 720;                 // the divider of the tape stops here, in the lower third, and becomes the road
+  var SO = 0.3;                 // camera scale on the whole-path shot
+  var PX = 1660;                // x of the end point of the solid line on the whole-path shot
+  var START_OX = 190;           // x of the start tick on the whole-path shot
+  function W(ox) { return (ox - 960) / SO; }      // world x of a point that sits at ox on the whole-path shot
+  var CAM0 = W(START_OX) + 540;                   // camera right after the stop: the start tick lands at x 420
+  var MK = [
+    { ox: 520, num: D.names, cap: 'Имен в титрах', sub: 'Твое имя среди них' },
+    { ox: 940, num: D.thanks, cap: 'Спасибо от коллег', sub: 'За них — больше ' + D.coins + ' коинов' },
+    { ox: 1380, num: D.eggs, cap: 'Пасхалок нашли', sub: 'На ' + D.dataTime + '. Коды принимаем до конца дня', col: COL.egg }
+  ];
+
+  /* ---------- timing ---------- */
+  var BRAKE = 1.2, BRAKE_DUR = 2;          // the tape brakes from 0:01.2 and stands at 0:03.2
+  var T_STOP = BRAKE + BRAKE_DUR;
+  var T_START = 3.6;                       // the start tick lands on the line
+  /* camera rides to each mark; every mark (number, label, line under it) stands whole 5 s before the next ride */
+  var PANS = [{ a: 5.0, b: 6.8 }, { a: 12.7, b: 14.9 }, { a: 20.8, b: 23.0 }];
+  var ZA = 28.9, ZB = 31.1;                // camera pulls back to the whole path
+  var T1 = 32.6;                           // the «1» lands in the end point
+  var TPH = 39.2;                          // the phrase
+  var RANGE = '2' + TS + '–' + TS + '4 декабря 2026';   // ToV: en dash with thin spaces in a range
+  /* the «1» is the viewer, not the event and not a promise: you are in the first line-up, the one on this road */
+  var ONE_CAP = 'Ты в первом составе';
+  var F_BIG = 540, F_SMALL = 170, F_ONE = 560, F_ONE_END = 280;
+  var GF = Math.log(F_SMALL / F_BIG) / Math.log(SO);   // numbers shrink a bit slower than the camera scale
+  var GC = Math.log(44 / 60) / Math.log(SO);           // labels: 60 px close up, 44 px on the whole path
+
+  function camera(tt) {
+    var c = CAM0;
+    for (var i = 0; i < PANS.length; i++) { var p = PANS[i]; if (tt > p.a) c = lerp(i ? W(MK[i - 1].ox) : CAM0, W(MK[i].ox), ease((tt - p.a) / (p.b - p.a))); }
+    var z = ease((tt - ZA) / (ZB - ZA)), s = Math.pow(SO, z);
+    return { x: lerp(c, 0, z), s: s, z: z, u: (1 - s) / (1 - SO) };
+  }
+  function sx(cv, w) { return 960 + (w - cv.x) * cv.s; }
+
+  /* text that fades out at the frame edges while the camera moves. The fade zone is 60 px, and wider
+     in the middle of the pull-back, when marks slide in from the left edge: they come in over ~0.4 s, not in two frames */
+  var edgeW = 60;
+  function tx(ctx, s, x, y, font, align, a, col) {
+    if (!(a > .003)) return;
+    ctx.font = font; var w = ctx.measureText(s).width;
+    var x0 = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x, x1 = x0 + w;
+    var e = clamp((x0 - 16) / edgeW, 0, 1) * clamp((1904 - x1) / edgeW, 0, 1);
+    text(ctx, s, x, y, font, align, a * e, col);
+  }
+  /* a tick across the road; drop lifts it above the line while it falls */
+  function tick(ctx, x, half, w, a, col, drop) {
+    if (!(a > .003) || x < -20 || x > 1940) return;
+    ctx.globalAlpha = Math.min(1, a); ctx.fillStyle = col || COL.fg;
+    ctx.fillRect(x - w / 2, RY - half - drop, w, half * 2);
+    ctx.globalAlpha = 1;
+  }
+  /* the number grows out of the line whole: it rises from under the road, the road hides what is still below */
+  function riseNum(ctx, s, x, F, gap, g, a, col) {
+    if (g <= 0 || !(a > .003)) return;
+    var base = lerp(RY + E.digitH(F) + 24, RY - gap, g), font = '900 ' + Math.round(F) + 'px ' + FD;
+    if (g < 1) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, 1920, RY - 4); ctx.clip(); }
+    tx(ctx, s, x, base, font, 'center', a * Math.min(1, g * 1.6), col);
+    if (g < 1) ctx.restore();
+  }
+
+  function draw(ctx, k, tt) {
+    /* the tape stops with the gap after the last subdivision's «Особая благодарность» exactly on the road */
+    var R = E.S.ranges, ys = R[R.length - 1].y1 - 10;
+    var STOP = { stopAt: BRAKE, stopDur: BRAKE_DUR, off0: 0 };
+    STOP.off0 = ys - RY - E.tapeOffset(1e9, STOP);
+    var off = E.tapeOffset(tt, STOP);
+    var lineY = tt < T_STOP ? ys - off : RY;
+    var cv = camera(tt), u = cv.u;
+    edgeW = 60 + 360 * 4 * cv.z * (1 - cv.z);     // set from tt on every call: draw stays a pure function of time
+
+    /* the tape: dims at 0:00, ends at the line, stands, then slides left with the camera and fades */
+    var ta = tt < 0 ? 1 : lerp(1, .42, ease(tt)) * (1 - ease((tt - PANS[0].a) / 1.2));
+    if (ta > .003) {
+      ctx.save();
+      if (tt >= 0) { ctx.beginPath(); ctx.rect(0, 0, 1920, lineY - 3); ctx.clip(); }
+      var dx = cv.x - CAM0; if (dx > 0) ctx.translate(-dx, 0);
+      E.drawTape(ctx, off, ta);
+      ctx.restore();
+    }
+
+    /* brightness of the path: dims for the «1» and the phrase, back to full on the end frame */
+    var dimIn = ease((tt - T1) / .6), back = ease((tt - VIDEO_END) / .8);
+    var pd = lerp(lerp(1, .28, dimIn), 1, back);
+    /* the line shows up once it has passed the corner caption, so it never runs through the text */
+    var la = ease((tt - .55) / .4) * lerp(lerp(1, .5, dimIn), 1, back);
+    var oneA = lerp(lerp(1, .3, ease((tt - TPH) / .8)), 1, back);
+
+    /* the line: full width while it is the tape's divider; after the start tick the road begins at the start */
+    var lw = lerp(6, 4, u), xs = sx(cv, W(START_OX)), xp = sx(cv, W(PX));
+    var rA = win(tt, ZB - .3, 1e9, .5, 0);
+    var started = tt >= T_START + .3, preA = started ? lerp(1, .22, ease((tt - T_START - .3) / .6)) : 1;
+    var tailA = clamp(cv.z * 3, 0, 1);       // close up the road runs off the frame; the end point shows when the camera pulls back
+    var xL = started ? clamp(xs, 0, 1920) : 0, xR = lerp(1920, Math.min(1920, xp - 20 * rA), tailA);
+    if (la > .003) {
+      ctx.fillStyle = COL.fg;
+      if (xL > 0) { ctx.globalAlpha = la * preA; ctx.fillRect(0, lineY - lw / 2, xL, lw); }
+      if (xR > xL) { ctx.globalAlpha = la; ctx.fillRect(xL, lineY - lw / 2, xR - xL, lw); }
+      /* beyond the end point the road goes on as a dashed line; on the end frame it slowly runs off the edge */
+      if (xp + 20 < 1920 && tailA > 0) {
+        ctx.globalAlpha = la * .75 * tailA; ctx.strokeStyle = COL.fg; ctx.lineWidth = lw; ctx.setLineDash([22, 18]);
+        ctx.lineDashOffset = -Math.max(0, tt - VIDEO_END) * 12;
+        ctx.beginPath(); ctx.moveTo(xp + 8 + 20 * rA, lineY); ctx.lineTo(1940, lineY); ctx.stroke();
+        ctx.setLineDash([]); ctx.lineDashOffset = 0;
+      }
+      ctx.globalAlpha = 1;
+    }
+    /* the empty point at the end of the solid line; the «1» fills it */
+    if (rA > .003) {
+      ctx.lineWidth = lw; ctx.strokeStyle = COL.fg; ctx.fillStyle = COL.bg;
+      ctx.beginPath(); ctx.arc(xp, RY, 14, 0, Math.PI * 2);
+      ctx.globalAlpha = rA; ctx.fill(); ctx.globalAlpha = rA * la; ctx.stroke();
+      var fill = ease((tt - T1 - .35) / .2) * oneA;
+      if (fill > .003) { ctx.globalAlpha = rA * fill; ctx.fillStyle = COL.fg; ctx.fill(); }
+      ctx.globalAlpha = 1;
+    }
+
+    var capPx = Math.round(60 * Math.pow(cv.s, GC)), capY = RY + lerp(96, 62, u);
+    var tickH = lerp(30, 20, u), tickW = lerp(6, 4, u);
+    function back2(z) { return ease((z - .4) / .6); }    // marks that left the frame come back as the camera pulls out
+    function leaving(p) { return p ? 1 - ease((tt - p.a) / (.5 * (p.b - p.a))) : 1; }
+
+    /* the start: date only, no time */
+    if (tt >= T_START) {
+      var sd = ease((tt - T_START) / .4);
+      var sa = Math.max(leaving(PANS[0]), back2(cv.z)) * pd;
+      tick(ctx, xs, tickH, tickW, sa * sd, COL.fg, (1 - sd) * 50);
+      var sla = win(tt, T_START + .2, 1e9, .5, 0) * sa;
+      tx(ctx, '2 декабря · старт', xs, capY, '600 ' + capPx + 'px ' + FB, 'center', sla * clamp(1 - 2 * u, 0, 1));
+      tx(ctx, '2 декабря', xs, capY, '500 ' + capPx + 'px ' + FB, 'center', sla * clamp(2 * u - 1, 0, 1) * .85);
+    }
+
+    /* the marks: the tick falls while the camera still rides, the number grows out of the line whole
+       when the camera stands, the label stands under the line */
+    MK.forEach(function (m, i) {
+      var p = PANS[i], drop = p.a + .55 * (p.b - p.a); if (tt < drop) return;
+      var lv = leaving(PANS[i + 1]);
+      var vis = Math.max(lv, back2(cv.z)) * pd;
+      var x = sx(cv, W(m.ox)), F = F_BIG * Math.pow(cv.s, GF);
+      var td = ease((tt - drop) / .4);
+      tick(ctx, x, tickH, tickW, vis * td, m.col, (1 - td) * 50);
+      riseNum(ctx, m.num, x, F, lerp(40, 22, u), ease((tt - p.b + .1) / .5), vis, m.col);
+      var cIn = ease((tt - p.b - .2) / .5);
+      tx(ctx, m.cap, x, capY + (1 - cIn) * 12, (u > .5 ? '500 ' : '600 ') + capPx + 'px ' + FB, 'center', cIn * vis);
+      var subA = ease((tt - p.b - .35) / .5) * lv * clamp(1 - u * 3, 0, 1) * .82;
+      tx(ctx, m.sub, x, RY + 176, '500 54px ' + FB, 'center', subA);
+    });
+
+    /* «1»: the biggest tick falls into the empty point, the tallest number grows out of it */
+    if (tt >= T1) {
+      var sh = ease((tt - TPH) / 1.0), t1d = ease((tt - T1) / .4);
+      tick(ctx, xp, lerp(42, 26, sh), lerp(10, 6, sh), oneA * t1d, COL.fg, (1 - t1d) * 80);
+      riseNum(ctx, '1', xp, lerp(F_ONE, F_ONE_END, sh), lerp(50, 32, sh), ease((tt - T1 - .4) / .7), oneA);
+      /* the caption sits level with the middle of the «1», well clear of the dimmed numbers below */
+      var cx1 = PX - 190;
+      tx(ctx, ONE_CAP, cx1, 424, '700 72px ' + FB, 'right', win(tt, T1 + 1.0, TPH + .5, .6, .5));
+      tx(ctx, RANGE, cx1, 506, '500 50px ' + FB, 'right', win(tt, T1 + 1.3, TPH + .5, .5, .5) * .8);
+    }
+
+    /* the phrase: the platform speaks to one person; gone before the end frame comes in */
+    tx(ctx, 'Ты на хорошем счету', 960, 430, '900 150px ' + FD, 'center', win(tt, TPH + .6, VIDEO_END - .1, .6, .5));
+
+    /* end frame: clean type over the whole path, stands till the end of the day */
+    var ea = win(tt, VIDEO_END + .1, 1e9, .8, 0);
+    if (ea > 0) {
+      E.lockup(ctx, 960, 70, ea);
+      text(ctx, 'С главным банковским днем!', 960, 320, '900 120px ' + FD, 'center', ea);
+      text(ctx, ONE_CAP + ' · ' + RANGE, 960, 405, '500 46px ' + FB, 'center', win(tt, VIDEO_END + .4, 1e9, .8, 0) * .75);
+      text(ctx, 'Данные на ' + D.dataTime + ' по Москве', 960, 900, '500 30px ' + FB, 'center', win(tt, VIDEO_END + .7, 1e9, .8, 0) * .55);
+    }
+
+    E.corner(ctx, tt, off, { switchAt: .9, until: VIDEO_END });
+  }
+
+  registerConcept({
+    id: 'pioneer',
+    arch: 'Первопроходец',
+    name: 'Лента становится дорогой',
+    idea: 'Лента впервые за три дня останавливается, а ее разделительная линия поворачивает вправо и становится дорогой. Итоги встают на нее отметками одного размера, в конце сплошной линии самая крупная отметка: «1 / ' + ONE_CAP + '». Справа дорога уходит за край пунктиром, без обещаний.',
+    strong: 'Самый надежный шаблон: без имен и текстур внутри цифр, лучшая читаемость с 10 метров. Все отметки одной высоты, поэтому скромная цифра не выглядит недобором.',
+    risk: 'Смысл держится на событии сильнее, чем в других вариантах: человек появляется только в «1». «Первый состав» и пунктир справа можно услышать как намек на продолжение, хотя про следующий год на экране ни слова.',
+    take: 'Правила размеров и надежность шаблона: все цифры одной высоты, появляются целиком и стоят не меньше 5 секунд.',
+    how: [
+      { h: 'Лента встает и поворачивает', p: 'С лентой снизу приходит линия, как разделитель между подразделениями, и лента впервые за три дня встает. Потом движение поворачивает вправо: остановленные строки уезжают влево, камера едет вдоль линии.' },
+      { h: 'Цифры как отметки на дороге', p: 'На линию падает засечка, и цифра вырастает из нее сразу целиком. Все цифры одного размера и стоят одинаково: 612 рядом с 7 412 не выглядит маленьким.' },
+      { h: 'Весь путь и «1»', p: 'Камера отъезжает: весь путь от 2 декабря до пустой точки на конце, дальше дорога уходит пунктиром. В точку падает самая крупная отметка, «1 / ' + ONE_CAP + '»: единица про зрителя, а не про банк и не про следующий год.' }
+    ],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: 36.5,
+    scenes: [
+      { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно. У ролика нет заставки: он начинается прямо из ленты.' },
+      { a: 0, b: T_START, rep: 3.4, title: 'Лента встает', time: '0:00–0:04', screen: ['Угол: «Итоги трех дней»'], text: 'Вместе с лентой снизу поднимается яркая линия, как разделитель между подразделениями, а под ней пусто. Лента гаснет наполовину, тормозит и впервые за три дня стоит. Это видно с 10 метров.' },
+      { a: T_START, b: PANS[0].b, rep: 4.8, title: 'Поворот', time: '0:04–0:07', screen: ['2 декабря · старт'], text: 'На левом краю на линию падает первая засечка: старт, только дата. Движение поворачивает вправо: остановленная лента уезжает влево и гаснет, камера едет вдоль линии.' },
+      { a: PANS[0].b, b: PANS[1].a, rep: 10, title: 'Имена', time: '0:07–0:13', screen: [D.names, 'Имен в титрах', 'Твое имя среди них'], text: 'Засечка опускается на линию, цифра вырастает из нее сразу целиком и замирает. Подпись под линией, как строка в ленте. Личная строка возвращает цифру к зрителю.' },
+      { a: PANS[1].a, b: PANS[2].a, rep: 18, title: 'Спасибо', time: '0:13–0:21', screen: [D.thanks, 'Спасибо от коллег', 'За них — больше ' + D.coins + ' коинов'], text: 'Камера едет дальше, прошлая отметка уходит за левый край. Коины одной строкой под спасибо: если банк не даст цифру, строка выключается.' },
+      { a: PANS[2].a, b: ZA, rep: 26, title: 'Пасхалки', time: '0:21–0:29', screen: [D.eggs, 'Пасхалок нашли', 'На ' + D.dataTime + '. Коды принимаем до конца дня'], text: 'Засечка и цифра цветом плашки пасхалки: его три дня видели в ленте. Единственная цифра, которая еще растет, поэтому рядом время среза.' },
+      { a: ZA, b: T1, rep: 32.2, title: 'Весь путь', time: '0:29–0:33', screen: ['2 декабря', D.names, 'Имен в титрах', D.thanks, 'Спасибо от коллег', D.eggs, 'Пасхалок нашли'], text: 'Камера отъезжает: весь путь в одном кадре, от 2 декабря до пустой точки на конце сплошной линии. За точкой пунктир уходит за правый край. Цифры мельче, но читаются.' },
+      { a: T1, b: TPH, rep: 36.5, title: 'Единица', time: '0:33–0:39', screen: ['1', ONE_CAP, RANGE], text: 'В пустую точку падает самая крупная засечка, из нее вырастает «1», выше всех цифр. Рядом «' + ONE_CAP + '»: единица про того, кто стоит у экрана, а не про банк, и ничего не обещает про следующий год.' },
+      { a: TPH, b: VIDEO_END, rep: 42.5, title: 'Фраза', time: '0:39–0:45', screen: ['Ты на хорошем счету'], text: 'Путь гаснет до 30%, над линией одна фраза. Три дня заставка говорила про весь банк, в финале платформа обращается к одному человеку. Подписи нет.' },
+      { a: VIDEO_END, b: TEND, rep: 49, title: 'Конечный кадр', time: '0:45 и до конца дня', screen: ['С главным банковским днем!', ONE_CAP + ' · ' + RANGE, '2 декабря', D.names, 'Имен в титрах', D.thanks, 'Спасибо от коллег', D.eggs, 'Пасхалок нашли', '1', 'Данные на ' + D.dataTime + ' по Москве'], text: 'Стоит до конца дня. Чистая типографика и весь путь с цифрами, подпись под поздравлением объясняет «1» тем, кто ролик пропустил. Пунктир справа медленно бежит за край, чтобы кадр не был мертвым.' }
+    ],
+    draw: draw
+  });
+})();
+
+/* ---- 05_athlete.js ---- */
+/* Атлет: «Финишная черта». Лента разгоняется, тормозит, и каждая цифра финиширует на одной черте. */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, FD = E.FD, COL = E.COL, win = E.win, text = E.text, ease = E.ease, clamp = E.clamp;
+  var VIDEO_END = 43, TEND = 51;
+
+  /* ---------- layout ---------- */
+  var LY = 740;                       // finish line
+  var F = 560;                        // big numbers: digits about 37% of the frame
+  var FN = '900 ' + F + 'px ' + FD;
+  var NBASE = 686;                    // baseline of a big number standing on the line
+  var SUBY = 836;                     // the line under the finish line
+  var CROSS = 1;                      // second when the last block of the tape crosses the line
+
+  /* ---------- the run: tape speed in px/s, smoothstep between keys. Base speed 120, peak 4x, no blur ---------- */
+  var V = 120;
+  var VK = [
+    [-4, V], [2, V],                                                  // end of the last circle, the tape finishes
+    [3.4, 3 * V], [4.8, 3 * V], [6.2, 0],                             // eggs: 3x, a short warm-up
+    [11.2, 0], [12.7, 3.5 * V], [14.7, 3.5 * V], [16.2, 0],           // thanks: 3.5x
+    [21.2, 0], [22.7, 4 * V], [24.3, 4 * V], [25.5, V], [26.5, V], [27.7, 0], // names: 4x, the longest, then a second at normal speed
+    [32.7, 0], [34, 2.5 * V], [35.7, 2.5 * V], [37.7, 0]              // the column and the phrase, calm
+  ];
+  var STOP = [6.2, 16.2, 27.7, 37.7];       // each block stands on the line
+  var RUN = [2, 11.2, 21.2, 32.7];         // each run starts; RUN[i + 1] carries block i away
+
+  function vel(t) {
+    if (t <= VK[0][0]) return VK[0][1];
+    for (var i = 0; i < VK.length - 1; i++) { var a = VK[i], b = VK[i + 1]; if (t < b[0]) return a[1] + (b[1] - a[1]) * ease((t - a[0]) / (b[0] - a[0])); }
+    return VK[VK.length - 1][1];
+  }
+  /* distance run since T0: exact integral of the smoothstep velocity */
+  function rel(t) {
+    var s = 0;
+    for (var i = 0; i < VK.length - 1; i++) {
+      var a = VK[i], b = VK[i + 1]; if (t <= a[0]) return s;
+      var d = b[0] - a[0], u = Math.min(1, (t - a[0]) / d);
+      s += a[1] * u * d + (b[1] - a[1]) * d * (u * u * u - u * u * u * u / 2);
+      if (t < b[0]) return s;
+    }
+    var L = VK[VK.length - 1]; return s + L[1] * Math.max(0, t - L[0]);
+  }
+
+  /* constants that depend on the shared tape sprite: computed once, same for every frame */
+  var G = null;
+  function geo() {
+    var h = E.S.credits.h; if (G && G.h === h) return G;
+    var cend = h - 150;                                      // bottom of the last «Особая благодарность» in the tape
+    var off0 = cend - LY - rel(CROSS);
+    var A = STOP.map(function (s) { return off0 + rel(s); }); // tape offset at each stop
+    function seg(from, to, rh) { var L = Math.floor((to - from) / rh) * rh; return [to - L, to]; }
+    G = {
+      h: h, cend: cend, off0: off0, A: A,
+      segs: [
+        { spr: sprPlates, r: seg(cend + 60, A[0] + 80, 36), a: .45, w: [1.6, 6.8, .9, .4] },
+        { spr: sprQuotes, r: seg(A[0] + 940, A[1] + 80, RH), a: .45, w: [11, 16.8, .6, .4] },
+        { spr: sprNames, r: seg(A[1] + 940, A[2] + 116, RH), a: .5, w: [21, 28.3, .6, .4] }
+      ]
+    };
+    return G;
+  }
+
+  /* ---------- material. Rows are tall (56 px) so that even at 4x a frame moves less than half a row: no strobing ---------- */
+  var RH = 56;
+  function sprPlates() { return E.S.plates; }   // egg plates, color only: no codes leak
+  function sprQuotes() {
+    return E.sprite('athlete-quotes', 22 * RH, function (x) {
+      var r = E.rng(67); x.fillStyle = COL.fg; x.textAlign = 'left'; x.font = '600 32px ' + FB;
+      for (var i = 0; i < 22; i++) { var px = -r() * 500, y = i * RH + 38; while (px < 1920) { var q = E.QUOTES[Math.floor(r() * E.QUOTES.length)]; x.fillText(q, px, y); px += x.measureText(q).width + 64; } }
+    });
+  }
+  function sprNames() {
+    return E.sprite('athlete-names', 24 * RH, function (x) {
+      var r = E.rng(57), p = E.personMaker(61); x.fillStyle = COL.fg; x.textAlign = 'left'; x.font = '700 34px ' + FB;
+      for (var i = 0; i < 24; i++) { var px = -r() * 260, y = i * RH + 40; while (px < 1920) { var n = p(); x.fillText(n, px, y); px += x.measureText(n).width + 56; } }
+    });
+  }
+
+  /* ---------- helpers ---------- */
+  /* content fades near the top and bottom edges, like the end of film credits */
+  function edgeA(y) { var b = y >= 1076 ? 0 : y <= 880 ? 1 : (1076 - y) / 196; var t = y <= 24 ? 0 : y >= 120 ? 1 : (y - 24) / 96; return .22 + .78 * ease(Math.min(b, t)); }
+  /* one line of text, skipped when fully outside the frame. h = height above the baseline */
+  function T(ctx, s, x, y, font, a, color, h, align) { if (!(a > .003) || y - h > 1085 || y < -h * .3) return; text(ctx, s, x, y, font, align || 'center', a, color); }
+  /* a block dims when the next run carries it away */
+  function outA(i, tt) { return RUN[i + 1] == null ? 1 : 1 - .72 * ease((tt - RUN[i + 1]) / .9); }
+  /* material of a number: the sprite starts at s0 and is cut at s1, in tape coordinates */
+  function band(ctx, spr, s0, s1, off, a) {
+    if (!(a > .003)) return; var y0 = s0 - off, y1 = s1 - off; if (y1 <= 0 || y0 >= 1080) return;
+    var c0 = Math.max(0, y0), c1 = Math.min(1080, y1);
+    ctx.save(); ctx.beginPath(); ctx.rect(0, c0, 1920, c1 - c0); ctx.clip(); ctx.globalAlpha = Math.min(1, a);
+    for (var y = y0; y < c1; y += spr.h) if (y + spr.h > c0) ctx.drawImage(spr.c, 0, y, 1920, spr.h);
+    ctx.restore();
+  }
+  /* the line fills from the touch point outwards, like a finish ribbon. Not a progress bar: no track, no end */
+  function ribbon(ctx, tt, t0, w, end, col) {
+    if (tt < t0) return; var p = ease((tt - t0) / .5), a = end == null ? 1 : 1 - ease((tt - end) / .4); if (!(a > 0)) return;
+    var hw = Math.min(960, w / 2) * p; ctx.globalAlpha = a; ctx.fillStyle = col; ctx.fillRect(960 - hw, LY - 5, hw * 2, 10); ctx.globalAlpha = 1;
+  }
+  function tapeA(tt) { if (tt < .2) return 1; if (tt < 2) return 1 - .7 * ease((tt - .2) / .7); return .3 * (1 - ease((tt - 2) / 1.4)); }
+  /* the bottom of the frame stays dark, like the start of film credits: what runs up never crosses the corner caption */
+  function bottomShade(ctx, a) {
+    if (!(a > .003)) return; var g = ctx.createLinearGradient(0, 900, 0, 1080);
+    g.addColorStop(0, 'rgba(11,13,12,0)'); g.addColorStop(.35, 'rgba(11,13,12,.9)'); g.addColorStop(1, 'rgba(11,13,12,.96)');
+    ctx.globalAlpha = Math.min(1, a); ctx.fillStyle = g; ctx.fillRect(0, 900, 1920, 180); ctx.globalAlpha = 1;
+  }
+
+  /* ---------- the blocks that finish. dy = how far below its place the block is now ---------- */
+  function eggs(ctx, dy, ba, pw) {
+    var nb = NBASE + dy, a = edgeA(nb) * ba, top = 235 + dy, bot = LY - 14 + dy;
+    if (a > .003 && bot > 0 && top < 1080) { ctx.globalAlpha = a; ctx.fillStyle = COL.egg; E.rr(ctx, 960 - pw / 2, top, pw, bot - top, 28); ctx.fill(); ctx.globalAlpha = 1; }
+    T(ctx, 'Пасхалок нашли', 960, 195 + dy, '600 60px ' + FB, edgeA(195 + dy) * ba, null, 44);
+    T(ctx, D.eggs, 960, nb, FN, a, '#FFFFFF', F * .72);
+  }
+  function thanks(ctx, dy, ba, fw) {
+    var nb = NBASE + dy, a = edgeA(nb) * ba, top = 150 + dy, bot = LY - 14 + dy;
+    if (a > .003 && bot > 0 && top < 1080) { ctx.globalAlpha = a * .55; ctx.strokeStyle = COL.fg; ctx.lineWidth = 3; E.rr(ctx, 960 - fw / 2, top, fw, bot - top, 16); ctx.stroke(); ctx.globalAlpha = 1; }
+    T(ctx, 'Спасибо от коллег', 960, 236 + dy, '600 58px ' + FB, edgeA(236 + dy) * ba * .9, null, 42);
+    T(ctx, D.thanks, 960, nb, FN, a, null, F * .72);
+  }
+  function names(ctx, dy, ba) {
+    var nb = NBASE + dy;
+    T(ctx, 'Имен в титрах', 960, 220 + dy, '600 60px ' + FB, edgeA(220 + dy) * ba * .75, null, 44);
+    T(ctx, D.names, 960, nb, FN, edgeA(nb) * ba, null, F * .72);
+  }
+  var SUBS = ['Коды принимаем до конца дня', 'И с ними больше ' + D.coins + ' коинов', 'Каждое прошло больше ' + D.shows + ' кругов'];
+  function sub(ctx, tt, i, dy) { var a = win(tt, STOP[i] + .4, RUN[i + 1] + .4, .6, .4) * .82; T(ctx, SUBS[i], 960, SUBY + dy, '500 54px ' + FB, a * edgeA(SUBY + dy), null, 40); }
+  var ROWS = [['Пасхалок нашли', D.eggs], ['Спасибо от коллег', D.thanks], ['Имен в титрах', D.names]];
+  var FC = '500 50px ' + FB, FR = '900 112px ' + FD;
+  function column(ctx, dy) {
+    // the axis of the tape: caption to the right edge, number from the left edge, the pair centered as a whole
+    var wc = 0, wn = 0; ROWS.forEach(function (r) { ctx.font = FC; wc = Math.max(wc, ctx.measureText(r[0]).width); ctx.font = FR; wn = Math.max(wn, ctx.measureText(r[1]).width); });
+    var ax = Math.round(960 + (wc - wn) / 2);
+    T(ctx, 'Общий счет', 960, 140 + dy, '700 52px ' + FB, edgeA(140 + dy) * .9, null, 38);
+    ROWS.forEach(function (r, i) {
+      var y = 264 + i * 116 + dy, a = edgeA(y);
+      T(ctx, r[0], ax - 32, y, FC, a * .72, null, 36, 'right');
+      T(ctx, r[1], ax + 32, y, FR, a, null, 81, 'left');
+    });
+    T(ctx, 'Ты на хорошем счету', 960, 690 + dy, '900 150px ' + FD, edgeA(690 + dy), null, 108);
+  }
+
+  function draw(ctx, k, tt) {
+    var g = geo(), off = g.off0 + rel(tt), va = ease(clamp(vel(tt) / 150, 0, 1));
+    // the tape: the last circle ends after its last «Особая благодарность»
+    var ta = tapeA(tt);
+    if (ta > 0) { var ye = Math.min(1080, g.cend - off); if (ye > 0) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, 1920, ye); ctx.clip(); E.drawTape(ctx, off, ta); ctx.restore(); } }
+    // what the number is made of runs past only while the tape moves
+    g.segs.forEach(function (s) { band(ctx, s.spr(), s.r[0], s.r[1], off, s.a * va * win(tt, s.w[0], s.w[1], s.w[2], s.w[3])); });
+    // the finish line
+    var la = win(tt, 0, 1e9, .5, 0);
+    if (la > 0) { ctx.globalAlpha = .4 * la; ctx.fillStyle = COL.fg; ctx.fillRect(0, LY - 1.5, 1920, 3); ctx.globalAlpha = 1; }
+    // blocks
+    ctx.font = FN; var wE = ctx.measureText(D.eggs).width, wT = ctx.measureText(D.thanks).width;
+    var pw = wE + 180, fw = clamp(wT + 280, 1240, 1780);
+    var dy0 = g.A[0] - off, dy1 = g.A[1] - off, dy2 = g.A[2] - off, dy3 = g.A[3] - off;
+    if (dy0 > -1400 && dy0 < 1400) { eggs(ctx, dy0, outA(0, tt), pw); sub(ctx, tt, 0, dy0); }
+    if (dy1 > -1400 && dy1 < 1400) { thanks(ctx, dy1, outA(1, tt), fw); sub(ctx, tt, 1, dy1); }
+    if (dy2 > -1400 && dy2 < 1400) { names(ctx, dy2, outA(2, tt)); sub(ctx, tt, 2, dy2); }
+    if (dy3 < 1400) column(ctx, dy3);
+    bottomShade(ctx, win(tt, .8, 1e9, .8, 0));
+    // the line fills at every finish; the last fill goes edge to edge and stays
+    ribbon(ctx, tt, CROSS, 1920, RUN[0], COL.fg);
+    ribbon(ctx, tt, STOP[0], 1920, RUN[1], COL.eggHi);
+    ribbon(ctx, tt, STOP[1], 1920, RUN[2], COL.fg);
+    ribbon(ctx, tt, STOP[2], 1920, RUN[3], COL.fg);
+    ribbon(ctx, tt, STOP[3], 1920, null, COL.fg);
+    T(ctx, 'С главным банковским днем!', 960, 830, '600 60px ' + FB, win(tt, STOP[3] + .5, 1e9, .8, 0), null, 44);
+    // end frame: signed by the lock-up, like a studio logo at the end of a film
+    var ea = win(tt, VIDEO_END + .2, 1e9, .8, 0);
+    if (ea > 0) {
+      E.lockup(ctx, 960, 916, ea);
+      E.drawQR(ctx, 1690, 846, 150, ea);
+      text(ctx, 'Введи код пасхалки', 1650, 905, '500 34px ' + FB, 'right', ea * .85);
+      text(ctx, 'на сайте праздника', 1650, 948, '500 34px ' + FB, 'right', ea * .85);
+      text(ctx, 'Данные на ' + D.dataTime + ' по Москве', 80, 1000, '500 30px ' + FB, 'left', ea * .55);
+    }
+    E.corner(ctx, tt, off, { switchAt: .9, until: VIDEO_END });
+  }
+
+  registerConcept({
+    id: 'athlete',
+    arch: 'Атлет',
+    name: 'Финишная черта',
+    idea: 'Ролик досказывает последний круг ленты как забег. Перед каждой цифрой лента ускоряется и несет то, из чего цифра сложена: плашки пасхалок, цитаты спасибо, имена. Потом тормозит, цифра приходит строкой титров и встает на финишную черту, а черта заливается цветом, как ленточка на финише.',
+    strong: 'Ритм «разгон, финиш, черта» читается без звука и на ходу, у каждого числа свой момент. Конечный кадр столбцом «Общий счет» хорошо фотографируется и говорит, что счет один на всех.',
+    risk: 'Спорт тянет к соревнованию, плану и рейтингу, а «Общий счет» могут услышать как банковский продукт. Здесь это сглажено: разгон без смаза и не быстрее четырех скоростей ленты, черта заливается от центра, а не как шкала, слов «рекорд» и «план» нет.',
+    take: 'Название «Общий счет» в список для банка и конечный кадр столбцом.',
+    how: [
+      { h: 'Разгон без смаза', p: 'Перед каждой цифрой лента ускоряется в три-четыре раза и несет материал цифры: плашки пасхалок, цитаты спасибо, имена. Строки остаются четкими, ряби нет.' },
+      { h: 'Цифра встает на черту', p: 'Число приходит снизу целым, как строка титров, в оформлении своего источника: пасхалки на фиолетовой плашке, спасибо в рамке «Особой благодарности», имена как строка титров. Черта заливается от точки касания, как ленточка на финише.' },
+      { h: 'Общий счет', p: 'В конце три числа приходят одним столбцом, под ними на черту встает «Ты на хорошем счету». Черта заливается через весь экран, и кадр стоит до конца дня.' }
+    ],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: 30,
+    scenes: [
+      { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно, в полную яркость. К 0:00 после последней «Особой благодарности» внизу становится пусто: круг кончается.' },
+      { a: 0, b: 2, rep: 1.7, title: 'Финиш ленты', time: '0:00–0:02', screen: ['Угол: «Итоги трех дней»', 'Без текста'], text: 'Лента за секунду гаснет до трети яркости, поперек экрана проявляется тонкая черта. Последний блок ленты пересекает ее, и черта заливается белым через весь экран. Перемену видно с 10 метров.' },
+      { a: 2, b: 11.2, rep: 9, title: 'Пасхалки', time: '0:02–0:11', screen: ['Пасхалок нашли', D.eggs, 'Коды принимаем до конца дня'], text: 'Короткая разминка: лента ускоряется втрое и несет плашки пасхалок без текста. Потом тормозит, и снизу приходит число на такой же фиолетовой плашке. Плашка встает на черту, и черта заливается фиолетовым от центра к краям.' },
+      { a: 11.2, b: 21.2, rep: 19, title: 'Спасибо', time: '0:11–0:21', screen: ['Спасибо от коллег', D.thanks, 'И с ними больше ' + D.coins + ' коинов'], text: 'Прошлое число уходит вверх, лента разгоняется сильнее и несет цитаты спасибо. Число приходит в рамке «Особой благодарности». Коины только в подстрочнике.' },
+      { a: 21.2, b: 32.7, rep: 30, title: 'Имена', time: '0:21–0:33', screen: ['Имен в титрах', D.names, 'Каждое прошло больше ' + D.shows + ' кругов'], text: 'Самый длинный разгон: в четыре раза быстрее ленты, но без смаза. Перед числом лента сбрасывает скорость до обычной, и секунду читаются живые имена. Число встает строкой титров.' },
+      { a: 32.7, b: 37.7, rep: 37.3, title: 'Общий счет', time: '0:33–0:38', screen: ['Общий счет', 'Пасхалок нашли: ' + D.eggs, 'Спасибо от коллег: ' + D.thanks, 'Имен в титрах: ' + D.names, 'Ты на хорошем счету'], text: 'Спокойный последний отрезок. Снизу приходит столбец со всеми тремя числами, как конец титров, под ним фраза. Отделы и города не делим: счет один на всех.' },
+      { a: 37.7, b: 43, rep: 41, title: 'Финиш', time: '0:38–0:43', screen: ['Общий счет', 'Пасхалок нашли: ' + D.eggs, 'Спасибо от коллег: ' + D.thanks, 'Имен в титрах: ' + D.names, 'Ты на хорошем счету', 'С главным банковским днем!'], text: 'Фраза встает на черту, и черта заливается белым через весь экран. После этого финиша лента больше не трогается.' },
+      { a: 43, b: 51, rep: 47, title: 'Конечный кадр', time: '0:43 и до конца дня', screen: ['Общий счет', 'Пасхалок нашли: ' + D.eggs, 'Спасибо от коллег: ' + D.thanks, 'Имен в титрах: ' + D.names, 'Ты на хорошем счету', 'С главным банковским днем!', 'Данные на ' + D.dataTime + ' по Москве', 'Введи код пасхалки / на сайте праздника'], text: 'Столбец, фраза, лок-ап и QR на сайт праздника. Чистая типографика без текстур: кадр стоит до конца дня, его фотографируют, он же уходит в письмо с итогами.' }
+    ],
+    draw: draw
+  });
+})();
+
+/* ---- 06_scientist.js ---- */
+/* Ученый: «Честный замер». Каждая цифра выложена по одной единице знаками ленты,
+   под чертой таблицы вместо числа вывод «Итого: ты на хорошем счету». */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, FD = E.FD, COL = E.COL, win = E.win, text = E.text, ease = E.ease, clamp = E.clamp, lerp = E.lerp;
+  var VIDEO_END = 45, TEND = 53;
+
+  /* zone of every field: the whole frame minus 60 px margins, above the corner */
+  var ZX0 = 60, ZY0 = 60, ZW = 1800, ZH = 870;
+  var DIM = .42;               // field brightness under a number row
+
+  /* ---------- camera: one unit up close, then pull back to the whole field ---------- */
+  function cam(tt, t0, t1, s0, F, P0) {
+    var e = ease((tt - t0) / (t1 - t0));
+    return { s: Math.exp(Math.log(s0) * (1 - e)), z: 1 - e, fx: F.x, fy: F.y, px: lerp(P0.x, F.x, e), py: lerp(P0.y, F.y, e), dx: 0, dy: 0 };
+  }
+  function sx(c, x) { return (x - c.fx) * c.s + c.px + c.dx; }
+  function sy(c, y) { return (y - c.fy) * c.s + c.py + c.dy; }
+  function view(c) { return { x0: c.fx + (-c.px - c.dx) / c.s, x1: c.fx + (1920 - c.px - c.dx) / c.s, y0: c.fy + (-c.py - c.dy) / c.s, y1: c.fy + (1080 - c.py - c.dy) / c.s }; }
+  function nbA(c) { return ease((.85 - c.z) / .4); }           // neighbours appear as the camera pulls back
+  function vecA(c) { return clamp((c.s - 1.9) / .5, 0, 1); }   // crisp vector units up close, cached field far away
+  var SPR_S = 2.6;                                               // below this scale the cached field is drawn
+
+  /* ---------- eggs: 612 plates, one plate = one find ---------- */
+  var EG = (function () {
+    var r = E.rng(612), ROWS = 28, pitch = ZH / ROWS, ph = 18, gap = 12, SW = 175, list = [], sample = -1;
+    for (var i = 0; i < ROWS; i++) {
+      var n = i % 7 === 3 ? 21 : 22, ws = [], j, fixed = i === 13 ? Math.floor(n / 2) : -1, sum = 0;
+      for (j = 0; j < n; j++) { ws.push(.45 + r() * 1.2); if (j !== fixed) sum += ws[j]; }
+      var k = (ZW - gap * (n - 1) - (fixed >= 0 ? SW : 0)) / sum, x = ZX0, y = ZY0 + i * pitch + (pitch - ph) / 2;
+      for (j = 0; j < n; j++) {
+        var w = j === fixed ? SW : ws[j] * k, hi = r() < .5;
+        if (j === fixed) { sample = list.length; hi = false; }
+        list.push({ x: x, y: y, w: w, hi: hi }); x += w + gap;
+      }
+    }
+    var sp = list[sample];
+    return { list: list, sample: sample, ph: ph, F: { x: sp.x + sp.w / 2, y: sp.y + ph / 2 }, s0: 8.3 };
+  })();
+  function eggSprite() {
+    return E.sprite('sci-eggs', 1080, function (x) {
+      EG.list.forEach(function (p) { x.fillStyle = p.hi ? COL.eggHi : COL.egg; E.rr(x, p.x, p.y, p.w, EG.ph, 4); x.fill(); });
+    });
+  }
+  function eggsVec(ctx, c, a, nA) {
+    var v = view(c), s = c.s, h = EG.ph * s, rad = Math.min(4 * s, 16, h / 2);
+    for (var i = 0; i < EG.list.length; i++) {
+      var p = EG.list[i]; if (p.x > v.x1 || p.x + p.w < v.x0 || p.y > v.y1 || p.y + EG.ph < v.y0) continue;
+      var al = (i === EG.sample ? 1 : nA) * a; if (al <= .003) continue;
+      ctx.globalAlpha = Math.min(1, al); ctx.fillStyle = p.hi ? COL.eggHi : COL.egg; E.rr(ctx, sx(c, p.x), sy(c, p.y), p.w * s, h, rad); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function blitFull(ctx, spr, c, a) { if (!(a > .003)) return; ctx.globalAlpha = Math.min(1, a); ctx.drawImage(spr.c, sx(c, 0), sy(c, 0), 1920 * c.s, spr.h * c.s); ctx.globalAlpha = 1; }
+
+  function eggs(ctx, tt) {
+    var a = win(tt, 4.5, 17.5, .8, .7); if (a <= 0) return;
+    eggSprite(); // built here, in a light frame
+    var c = cam(tt, 9.2, 12, EG.s0, EG.F, { x: 960, y: 450 });
+    c.dy = 160 * (1 - ease((tt - 4.5) / .9)) - 220 * ease((tt - 16.8) / .7);
+    var dim = 1 - (1 - DIM) * ease((tt - 11.9) / .7), fa = a * dim, vA = vecA(c);
+    if (c.s < SPR_S) blitFull(ctx, eggSprite(), c, fa);
+    if (vA > 0) eggsVec(ctx, c, fa * vA, nbA(c));
+    // the sample plate keeps its line while it is big: this egg is used up, so its line can be shown
+    var ta = clamp((c.s - 4.5) / 2, 0, 1) * a; if (ta > 0) {
+      var k = c.s / EG.s0, cx = sx(c, EG.F.x), cy = sy(c, EG.F.y), f = 56 * k;
+      text(ctx, 'Моральная поддержка', cx - 35 * k, cy + .35 * f, '500 ' + f.toFixed(1) + 'px ' + FB, 'right', ta, '#FFFFFF');
+      text(ctx, 'Кофемашина', cx + 35 * k, cy + .35 * f, '700 ' + f.toFixed(1) + 'px ' + FB, 'left', ta, '#FFFFFF');
+    }
+    text(ctx, 'Ее нашли первой — через ' + D.firstEggMin + ' минуты после старта', 960, 690, '500 54px ' + FB, 'center', win(tt, 4.9, 9.9, .6, .5) * .85);
+  }
+
+  /* ---------- thanks: 2 318 arrows from the «автор → адресат» line, one arrow = one thanks ---------- */
+  var TH = (function () {
+    var r = E.rng(2318), ROWS = 40, COLS = 58, cw = ZW / COLS, rh = ZH / ROWS, jit = [];
+    for (var i = 0; i < ROWS; i++) jit.push((r() - .5) * 10);
+    var si = 20, sj = 29;
+    return { ROWS: ROWS, COLS: COLS, cw: cw, rh: rh, jit: jit, lastN: 2318 - (ROWS - 1) * COLS, L: 22, hd: 6.2, lw: 2.5,
+      sample: si * COLS + sj, F: { x: ZX0 + (sj + .5) * cw + jit[si], y: ZY0 + (si + .5) * rh }, s0: 10 };
+  })();
+  function arrowPath(x, cx, cy, L, h) { x.moveTo(cx - L / 2, cy); x.lineTo(cx + L / 2, cy); x.moveTo(cx + L / 2 - h, cy - h); x.lineTo(cx + L / 2, cy); x.lineTo(cx + L / 2 - h, cy + h); }
+  function lineStyle(x, w) { x.strokeStyle = COL.fg; x.lineWidth = w; x.lineCap = 'round'; x.lineJoin = 'round'; }
+  function thxRow() {
+    return E.sprite('sci-thx-row', 30, function (x) {
+      lineStyle(x, TH.lw); x.beginPath();
+      for (var j = 0; j < TH.COLS; j++) arrowPath(x, ZX0 + (j + .5) * TH.cw, 15, TH.L, TH.hd);
+      x.stroke();
+    });
+  }
+  function thxField(ctx, c, a) {
+    if (!(a > .003)) return;
+    var spr = thxRow(), r = spr.c.width / 1920; ctx.globalAlpha = Math.min(1, a);
+    for (var i = 0; i < TH.ROWS; i++) {
+      var n = i === TH.ROWS - 1 ? TH.lastN : TH.COLS, sw = ZX0 + n * TH.cw, wy = ZY0 + (i + .5) * TH.rh - 15;
+      ctx.drawImage(spr.c, 0, 0, sw * r, 30 * r, sx(c, TH.jit[i]), sy(c, wy), sw * c.s, 30 * c.s);
+    }
+    ctx.globalAlpha = 1;
+  }
+  function thxVec(ctx, c, a, nA) {
+    var v = view(c), s = c.s, i, j;
+    lineStyle(ctx, TH.lw * s);
+    if (nA * a > .003) {
+      ctx.globalAlpha = Math.min(1, nA * a); ctx.beginPath();
+      var r0 = Math.max(0, Math.floor((v.y0 - ZY0) / TH.rh) - 1), r1 = Math.min(TH.ROWS - 1, Math.ceil((v.y1 - ZY0) / TH.rh));
+      for (i = r0; i <= r1; i++) {
+        var n = i === TH.ROWS - 1 ? TH.lastN : TH.COLS, jt = TH.jit[i], cy = sy(c, ZY0 + (i + .5) * TH.rh);
+        var j0 = Math.max(0, Math.floor((v.x0 - ZX0 - jt) / TH.cw) - 1), j1 = Math.min(n - 1, Math.ceil((v.x1 - ZX0 - jt) / TH.cw));
+        for (j = j0; j <= j1; j++) { if (i * TH.COLS + j === TH.sample) continue; arrowPath(ctx, sx(c, ZX0 + (j + .5) * TH.cw + jt), cy, TH.L * s, TH.hd * s); }
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = Math.min(1, a); ctx.beginPath(); arrowPath(ctx, sx(c, TH.F.x), sy(c, TH.F.y), TH.L * s, TH.hd * s); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+  }
+  function thanks(ctx, tt) {
+    var a = win(tt, 17.4, 30.2, .8, .7); if (a <= 0) return;
+    var c = cam(tt, 22.1, 24.6, TH.s0, TH.F, { x: 960, y: 450 });
+    c.dy = 160 * (1 - ease((tt - 17.4) / .9)) - 220 * ease((tt - 29.5) / .7);
+    c.dx = 4 * Math.max(0, tt - 24);   // the field drifts slowly the way the arrows point
+    var dim = 1 - (1 - DIM) * ease((tt - 24.5) / .7), fa = a * dim, vA = vecA(c);
+    if (c.s < SPR_S) thxField(ctx, c, fa);
+    if (vA > 0) thxVec(ctx, c, fa * vA, nbA(c));
+    // two faint name strokes around the sample arrow: someone → someone, nobody singled out
+    var ba = clamp((c.z - .8) / .2, 0, 1) * a * .35; if (ba > 0) {
+      var cx = sx(c, TH.F.x), cy = sy(c, TH.F.y), s = c.s, g = (TH.L / 2 + 6) * s, bl = 26 * s, bh = 1.6 * s;
+      ctx.globalAlpha = ba; ctx.fillStyle = COL.fg;
+      E.rr(ctx, cx - g - bl, cy - bh / 2, bl, bh, bh / 2); ctx.fill(); E.rr(ctx, cx + g, cy - bh / 2, bl, bh, bh / 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    text(ctx, 'Одно спасибо — от человека человеку', 960, 690, '600 60px ' + FB, 'center', win(tt, 17.7, 22.7, .6, .5) * .9);
+  }
+
+  /* ---------- names: the whole circle, 7 412 lines in 30 columns, one stroke = one line of the tape ---------- */
+  var NM = (function () {
+    var r = E.rng(7412), V = 6, R = 248, COLS = 30, rl = [], nl = [], off = [];
+    for (var v = 0; v < V; v++) { var a = [], b = []; for (var k = 0; k < R; k++) { a.push(9 + r() * 16); b.push(11 + r() * 14); } rl.push(a); nl.push(b); }
+    for (var j = 0; j < COLS; j++) off.push((j * 53 + 17) % R);
+    var p = ZH / R, s0 = 50 / p;                       // tape line pitch 50 px = one stroke row
+    var trW = 1920 / s0, trH = 1080 / s0, trX = ZX0 + 30 - trW / 2, trY = ZY0 + p / 2 - 192 / s0;
+    return { V: V, R: R, COLS: COLS, rl: rl, nl: nl, off: off, p: p, last: 7412 - (COLS - 1) * R, s0: s0,
+      TR: { x: trX, y: trY, w: trW, h: trH }, trRows: Math.floor((trY + trH - ZY0) / p), F: { x: ZX0 + 30, y: trY + trH / 2 } };
+  })();
+  function colsSprite() {
+    return E.sprite('sci-cols', 880, function (x) {
+      x.fillStyle = COL.fg;
+      for (var pass = 0; pass < 2; pass++) {
+        x.globalAlpha = pass ? .95 : .5;
+        for (var v = 0; v < NM.V; v++) {
+          var ax = v * 60 + 30;
+          for (var k = 0; k < NM.R; k++) { var y = (k + .5) * NM.p - 1; if (pass) x.fillRect(ax + 3, y, NM.nl[v][k], 2); else x.fillRect(ax - 3 - NM.rl[v][k], y, NM.rl[v][k], 2); }
+        }
+      }
+      x.globalAlpha = 1;
+    });
+  }
+  function namesField(ctx, c, a) {
+    if (!(a > .003)) return;
+    var spr = colsSprite(), r = spr.c.width / 1920, p = NM.p; ctx.globalAlpha = Math.min(1, a);
+    for (var j = 0; j < NM.COLS; j++) {
+      var v = j % NM.V, o = NM.off[j], n = j === NM.COLS - 1 ? NM.last : NM.R, wx = ZX0 + j * 60, n1 = Math.min(NM.R - o, n), n2 = n - n1;
+      ctx.drawImage(spr.c, v * 60 * r, o * p * r, 60 * r, n1 * p * r, sx(c, wx), sy(c, ZY0), 60 * c.s, n1 * p * c.s);
+      if (n2 > 0) ctx.drawImage(spr.c, v * 60 * r, 0, 60 * r, n2 * p * r, sx(c, wx), sy(c, ZY0 + n1 * p), 60 * c.s, n2 * p * c.s);
+    }
+    ctx.globalAlpha = 1;
+  }
+  function namesVec(ctx, c, a, nA, tapeA) {
+    var v = view(c), s = c.s, p = NM.p, th = s <= 2 ? 2 * s : 4 + (s - 2) * .55;
+    var j0 = Math.max(0, Math.floor((v.x0 - ZX0) / 60)), j1 = Math.min(NM.COLS - 1, Math.floor((v.x1 - ZX0) / 60));
+    var i0 = Math.max(0, Math.floor((v.y0 - ZY0) / p)), i1 = Math.min(NM.R - 1, Math.floor((v.y1 - ZY0) / p));
+    ctx.fillStyle = COL.fg;
+    for (var pass = 0; pass < 2; pass++) {
+      var pa = a * (pass ? .95 : .5);
+      for (var j = j0; j <= j1; j++) {
+        var vv = j % NM.V, o = NM.off[j], n = j === NM.COLS - 1 ? NM.last : NM.R, ax = ZX0 + j * 60 + 30, im = Math.min(i1, n - 1);
+        for (var i = i0; i <= im; i++) {
+          var al = (j === 0 && i <= NM.trRows ? 1 - tapeA : nA) * pa; if (al <= .003) continue;
+          var k = (i + o) % NM.R, Y = sy(c, ZY0 + (i + .5) * p) - th / 2; ctx.globalAlpha = Math.min(1, al);
+          if (pass) ctx.fillRect(sx(c, ax + 3), Y, NM.nl[vv][k] * s, th); else ctx.fillRect(sx(c, ax - 3 - NM.rl[vv][k]), Y, NM.rl[vv][k] * s, th);
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  function names(ctx, tt) {
+    if (tt < 29.9) return;
+    colsSprite(); // built here, in a light frame
+    var c = cam(tt, 31.3, 35, NM.s0, NM.F, { x: 960, y: 540 });
+    c.dy = 1080 * (1 - ease((tt - 29.9) / 1));
+    if (tt > VIDEO_END) c.dx = 6 * Math.sin((tt - VIDEO_END) / 12);   // the card background barely moves
+    var dim = 1 - (1 - DIM) * ease((tt - 34.8) / .8); dim = lerp(dim, .07, ease((tt - 40.2) / 1.2));
+    var tapeA = clamp((c.s - 3.2) / 2.8, 0, 1), vA = vecA(c);
+    if (tapeA > 0) { var spr = E.S.credits, r = spr.c.width / 1920, kk = c.s / NM.s0; ctx.globalAlpha = tapeA; ctx.drawImage(spr.c, 0, 0, 1920 * r, 1080 * r, sx(c, NM.TR.x), sy(c, NM.TR.y), 1920 * kk, 1080 * kk); ctx.globalAlpha = 1; }
+    if (c.s < SPR_S) namesField(ctx, c, dim);
+    if (vA > 0) namesVec(ctx, c, dim * vA, nbA(c), tapeA);
+  }
+
+  /* ---------- a number as a line of the tape: caption at the axis, value after it ---------- */
+  var AX = 689, RF = 540, RBASE = 658, SUBY = 770;
+  var AX2 = 770, TY = [420, 520, 620], LINE_Y = 668, IT_Y = 792, LX0 = 279, LX1 = 1641;
+  function band(ctx, a) {
+    if (!(a > .003)) return;
+    var g = ctx.createLinearGradient(0, 180, 0, 900);
+    g.addColorStop(0, 'rgba(11,13,12,0)'); g.addColorStop(.16, 'rgba(11,13,12,.62)'); g.addColorStop(.84, 'rgba(11,13,12,.62)'); g.addColorStop(1, 'rgba(11,13,12,0)');
+    ctx.globalAlpha = Math.min(1, a); ctx.fillStyle = g; ctx.fillRect(0, 180, 1920, 720); ctx.globalAlpha = 1;
+  }
+  function bigRow(ctx, cap, val, sub, a, sa) {
+    if (!(a > 0)) return;
+    band(ctx, a);
+    text(ctx, cap, AX - 40, RBASE, '600 60px ' + FB, 'right', a * .85);
+    var vx = AX + 24; text(ctx, val, vx, RBASE, E.fitFont(ctx, val, '900', FD, RF, 1860 - vx), 'left', a);
+    if (sub) text(ctx, sub, vx + 8, SUBY, E.fitFont(ctx, sub, '500', FB, 54, 1860 - vx - 8), 'left', sa * .8);
+  }
+  function tableRow(ctx, cap, val, y, a) {
+    text(ctx, cap, AX2 - 30, y, '600 50px ' + FB, 'right', a * .7);
+    text(ctx, val, AX2 + 30, y, '900 92px ' + FD, 'left', a);
+  }
+  function rows(ctx, tt) {
+    bigRow(ctx, 'Пасхалок нашли', D.eggs, 'Коды принимаем до конца дня', win(tt, 12.2, 17.2, .7, .6), win(tt, 12.5, 17.2, .7, .6));
+    bigRow(ctx, 'Спасибо от коллег', D.thanks, 'И с ними больше ' + D.coins + ' коинов', win(tt, 24.9, 29.9, .7, .6), win(tt, 25.2, 29.9, .7, .6));
+    // names: the big row shrinks into the last line of the table
+    var na = win(tt, 35.2, 1e9, .7, 0); if (na <= 0) return;
+    var m = ease((tt - 40.2) / 1), ts = 30 * ease((tt - VIDEO_END) / .9);   // the table settles 30 px lower under the greeting
+    if (m < 1) { band(ctx, na * (1 - m)); var sa = win(tt, 35.4, 40.4, .7, .5); if (sa > 0) text(ctx, 'Весь круг на одном экране. И ты здесь', AX + 32, SUBY, E.fitFont(ctx, 'Весь круг на одном экране. И ты здесь', '500', FB, 54, 1860 - AX - 32), 'left', sa * .8); }
+    var cf = lerp(60, 50, m), vf = lerp(RF, 92, m), y = lerp(RBASE, TY[2], m) + ts, vx = lerp(AX + 24, AX2 + 30, m);
+    text(ctx, 'Имен в титрах', lerp(AX - 40, AX2 - 30, m), y, '600 ' + cf.toFixed(1) + 'px ' + FB, 'right', na * lerp(.85, .7, m));
+    text(ctx, D.names, vx, y, E.fitFont(ctx, D.names, '900', FD, Math.round(vf), 1860 - vx), 'left', na);
+    // the table collects the other two lines, a line is drawn, and under it the result instead of a number
+    var a1 = win(tt, 40.7, 1e9, .7, 0), a2 = win(tt, 41, 1e9, .7, 0);
+    if (a1 > 0) tableRow(ctx, 'Пасхалок нашли', D.eggs, TY[0] - 14 * (1 - a1) + ts, a1);
+    if (a2 > 0) tableRow(ctx, 'Спасибо от коллег', D.thanks, TY[1] - 14 * (1 - a2) + ts, a2);
+    var lp = ease((tt - 41.4) / .7); if (lp > 0) { ctx.globalAlpha = .9; ctx.fillStyle = COL.fg; ctx.fillRect(LX0, LINE_Y - 2 + ts, (LX1 - LX0) * lp, 4); ctx.globalAlpha = 1; }
+    var ia = win(tt, 42, 1e9, .8, 0); if (ia > 0) {
+      var iy = IT_Y + 16 * (1 - ia) + ts;
+      text(ctx, 'Итого', AX2 - 30, iy, '600 54px ' + FB, 'right', ia * .85);
+      text(ctx, 'ты на хорошем счету', AX2 + 30, iy, '900 104px ' + FD, 'left', ia);
+    }
+  }
+
+  /* ---------- the card that stays until the end of the day ---------- */
+  function card(ctx, tt) {
+    var a = win(tt, VIDEO_END, 1e9, .8, 0); if (a <= 0) return;
+    E.lockup(ctx, 960, 60, a);
+    text(ctx, 'С главным банковским днем!', 960, 274, '900 108px ' + FD, 'center', a);
+    var b = win(tt, VIDEO_END + .5, 1e9, .8, 0);
+    text(ctx, 'Данные на ' + D.dataTime + ' по Москве', LX0, 986, '500 30px ' + FB, 'left', b * .55);
+    E.drawQR(ctx, 1712, 872, 136, b);
+    text(ctx, 'Введи код пасхалки', 1666, 942, '500 34px ' + FB, 'right', b * .85);
+    text(ctx, 'на сайте праздника', 1666, 986, '500 34px ' + FB, 'right', b * .85);
+  }
+
+  function header(ctx, tt) {
+    var a = win(tt, .7, 4.5, .7, .6); if (a <= 0) return;
+    var up = 120 * (1 - ease((tt - .7) / .9)) - 40 * ease((tt - 3.9) / .6);
+    band(ctx, a * .8);
+    text(ctx, 'Итоги трех дней', 960, 560 + up, '900 170px ' + FD, 'center', a);
+    text(ctx, 'Данные на ' + D.dataTime + ' по Москве', 960, 660 + up, '500 44px ' + FB, 'center', win(tt, 1.2, 4.5, .6, .6) * .75);
+  }
+
+  /* the bottom strip under the corner captions stays dark: fields running past it never cross the text.
+     At rest every field ends at y 930, above the strip */
+  function bottomShade(ctx, a) {
+    if (!(a > .003)) return; var g = ctx.createLinearGradient(0, 935, 0, 1080);
+    g.addColorStop(0, 'rgba(11,13,12,0)'); g.addColorStop(.3, 'rgba(11,13,12,.9)'); g.addColorStop(1, 'rgba(11,13,12,.96)');
+    ctx.globalAlpha = Math.min(1, a); ctx.fillStyle = g; ctx.fillRect(0, 935, 1920, 145); ctx.globalAlpha = 1;
+  }
+
+  function draw(ctx, k, tt) {
+    var off = E.tapeOffset(tt);
+    var ta = tt < .3 ? 1 : tt < 1.3 ? 1 - .85 * ease((tt - .3) / 1) : .15 * (1 - ease((tt - 4) / .8));
+    E.drawTape(ctx, off, ta);
+    header(ctx, tt);
+    eggs(ctx, tt);
+    thanks(ctx, tt);
+    names(ctx, tt);
+    bottomShade(ctx, win(tt, 4.3, 1e9, .6, 0));
+    rows(ctx, tt);
+    card(ctx, tt);
+    E.corner(ctx, tt, off, { switchAt: .9, until: VIDEO_END });
+    text(ctx, 'Данные на ' + D.dataTime + ' по Москве', 1840, 1015, '500 28px ' + FB, 'right', win(tt, 4.3, VIDEO_END, .6, .6) * .55);
+  }
+
+  registerConcept({
+    id: 'scientist',
+    arch: 'Ученый',
+    name: 'Честный замер',
+    idea: 'Итоги как честный замер. Каждая цифра начинается с одной единицы крупно, потом камера отъезжает к полю, где число выложено по одной: плашками пасхалок, стрелками спасибо, строками имен. Под чертой таблицы вместо числа вывод: «Итого: ты на хорошем счету».',
+    strong: 'Цифры не нарисованы, а сложены из того, что люди сделали за три дня, и это видно. «Итого» дает личный вывод из данных, а время замера на экране делает честной любую цифру.',
+    risk: 'Самая тяжелая анимация из семи: три поля и три отъезда камеры. Поле из 7 412 строк может рябить на телевизоре, поэтому к концу отъезда оно приглушается. Таблица звучит как отчет, если подписи сухие: здесь они про людей, «от человека человеку» и «И ты здесь».',
+    take: 'Пороги для скромных цифр, которые согласуем с банком заранее, до 2 декабря.',
+    how: [
+      { h: 'Одна единица крупно', p: 'Каждая цифра начинается с образца: одна плашка пасхалки, одна стрелка спасибо, первый экран ленты. Зритель сразу видит, что именно считаем.' },
+      { h: 'Отъезд к полю', p: 'Камера отъезжает, и образец становится одним из многих: 612 плашек, 2 318 стрелок, 7 412 строк в 30 колонках. Поле и есть цифра, выложенная по одной.' },
+      { h: 'Итого под чертой', p: 'Три строки собираются в таблицу, под чертой на месте числа вывод про зрителя. Время данных стоит на экране весь ролик и в карточке.' }
+    ],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: 38,
+    scenes: [
+      { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно. Ролик начинается прямо из нее, без заставки.' },
+      { a: 0, b: 4.5, rep: 2.6, title: 'Заголовок', time: '0:00–0:05', screen: ['Итоги трех дней', 'Данные на ' + D.dataTime + ' по Москве', 'Угол: «Итоги трех дней»'], text: 'Лента за секунду гаснет до 15%, снизу поднимается крупный заголовок в стиле подразделения. Время данных сразу на экране: это замер, а не отчет.' },
+      { a: 4.5, b: 9.9, rep: 7.5, title: 'Одна находка', time: '0:05–0:10', screen: ['Моральная поддержка: Кофемашина', 'Ее нашли первой — через ' + D.firstEggMin + ' минуты после старта', 'Угол: «Итоги трех дней», справа «Данные на ' + D.dataTime + ' по Москве» до конца ролика'], text: 'Одна плашка крупно: пасхалка, которую уже активировали 30 человек, поэтому ее строку можно показать. Подпись рассказывает историю, а не цифру.' },
+      { a: 9.9, b: 17.4, rep: 15, title: 'Пасхалки', time: '0:10–0:17', screen: ['Пасхалок нашли: ' + D.eggs, 'Коды принимаем до конца дня'], text: 'Камера отъезжает, и плашка становится одной из 612. Поле приглушается, поверх строка в формате ленты: подпись у осевой, значение за ней.' },
+      { a: 17.4, b: 22.4, rep: 20, title: 'Одно спасибо', time: '0:17–0:22', screen: ['Одно спасибо — от человека человеку'], text: 'Одна стрелка из подписи «автор → адресат», и подпись про людей, а не про цифру. Вместо имен два бледных штриха: конкретных людей не выделяем.' },
+      { a: 22.4, b: 29.9, rep: 27.5, title: 'Спасибо', time: '0:22–0:30', screen: ['Спасибо от коллег: ' + D.thanks, 'И с ними больше ' + D.coins + ' коинов'], text: 'Отъезд к полю из 2 318 стрелок. Поле медленно дрейфует туда, куда смотрят стрелки. Коины только в подстрочнике.' },
+      { a: 29.9, b: 31.3, rep: 31.1, title: 'Начало круга', time: '0:30–0:31', screen: ['Без текста: первый экран ленты'], text: 'Снизу поднимается первый экран ленты, как в начале каждого круга. Его узнают за секунду.' },
+      { a: 31.3, b: 40.2, rep: 38, title: 'Весь круг', time: '0:31–0:40', screen: ['Имен в титрах: ' + D.names, 'Весь круг на одном экране. И ты здесь'], text: 'Плавный отъезд почти на четыре секунды: экран становится колонкой, рядом встают еще 29, имена мельчают до штрихов. Один штрих равен одной строке с именем.' },
+      { a: 40.2, b: 45, rep: 44, title: 'Итого', time: '0:40–0:45', screen: ['Пасхалок нашли: ' + D.eggs, 'Спасибо от коллег: ' + D.thanks, 'Имен в титрах: ' + D.names, 'Итого: ты на хорошем счету'], text: 'Строка имен уменьшается и встает в таблицу, над ней встают две другие. Под чертой на месте числа вывод, дальше ничего не двигается.' },
+      { a: 45, b: 53, rep: 49, title: 'Карточка', time: '0:45 и до конца дня', screen: ['С главным банковским днем!', 'Пасхалок нашли: ' + D.eggs, 'Спасибо от коллег: ' + D.thanks, 'Имен в титрах: ' + D.names, 'Итого: ты на хорошем счету', 'Данные на ' + D.dataTime + ' по Москве', 'Введи код пасхалки', 'на сайте праздника'], text: 'Стоит до конца дня. Чистая типографика на едва заметном поле имен: лок-ап, поздравление, таблица с «Итого», время данных и QR.' }
+    ],
+    draw: draw
+  });
+})();
+
+/* Short intro above the screen: смысл, почему так, что придумали */
+var INTRO = {
+ "after-credits": {
+  "meaning": "Три дня лента рассказывала историю про всех. Финал досказывает ее до одного человека у экрана: среди тысяч имен в титрах есть твое.",
+  "why": "Формат «Титры» уже кино, и Рассказчик ставит финал туда, где в кино идет сцена после титров и досказывает историю. Кульминацию дает единица: она не зависит от числа спасибо и пасхалок.",
+  "device": "Цифры как окна в ленту: внутри огромного числа идет то, что оно считает. В конце узкая единица с колонкой имен и подписью «из 7 412 имен — твое», и лента впервые за три дня встает."
+ },
+ "everyperson": {
+  "meaning": "В титрах все стоят на равных, и нужен каждый. Последнее спасибо говорят все каждому: «Без тебя титры были бы на одну строку короче».",
+  "why": "Для Обычного человека все равны, и в ленте нет отдельного блока руководства. Итоги идут еще одним подразделением титров: цифра стоит на месте имени, главной цифры нет.",
+  "device": "Карта круга: камера отъезжает, и весь круг ленты помещается в один кадр, 7 412 черт разной длины, на своих местах горят 30 пасхалок. Подпись: «Каждая черта — чья-то строка в титрах»."
+ },
+ "matchmaker": {
+  "meaning": "Титры называли каждого отдельной строкой. Финал показывает, что было между строками: коллеги благодарили коллег, и весь банк на хорошем счету друг у друга.",
+  "why": "Сваха сводит людей и отходит в сторону. Знак для этого уже есть в ленте: строка спасибо «автор → адресат», и весь ролик держится на этой стрелке.",
+  "device": "Каждое число стоит на стрелке «кто → кому». На пике 24 настоящие строки спасибо сливаются в одну стрелку, а в конце она становится двусторонней: «Друг у друга»."
+ },
+ "translator": {
+  "meaning": "За строками банковской выписки стоят поступки людей: кто досмотрел титры до шутки, кто не прошел мимо коллеги. В конце язык банка и язык людей сходятся в слове «Спасибо».",
+  "why": "Платформа «На хорошем счету» уже говорит о людях языком банка. Переводчик подписывает под банковской строкой человеческую, и подпись «Столько раз…» подходит к любому числу.",
+  "device": "Подстрочник: строка выписки въезжает с лентой и вырастает в огромное число, банковские знаки гаснут. Снизу встает перевод: «Столько раз коллеги не прошли мимо»."
+ },
+ "pioneer": {
+  "meaning": "Такого праздника в банке еще не было, и три дня стали общей дорогой, по которой до этого никто не шел. Главная отметка на ней про тебя.",
+  "why": "Праздник в банке проходит впервые. Первопроходец ставит отметки на новом пути и ни с кем не меряется, поэтому все отметки одного размера, без шкалы и цели.",
+  "device": "Лента встает, а ее разделительная линия поворачивает вправо и становится дорогой. На нее падают засечки, из них вырастают цифры, в конце самая крупная: «1 / Ты в первом составе»."
+ },
+ "athlete": {
+  "meaning": "Праздник прошел как один забег на весь банк, и к финишу пришли все вместе. Счет один на всех, без победителей и рейтинга, и твое имя в нем засчитано.",
+  "why": "Атлет говорит результатом, а слово «счет» значит и счет в банке, и счет матча. Лента три дня шла кругами, поэтому итоги приходят как финиш последнего круга.",
+  "device": "Перед каждой цифрой лента разгоняется и тормозит, число встает на финишную черту, и черта заливается цветом, как ленточка. В конце три числа сходятся в столбец «Общий счет»."
+ },
+ "scientist": {
+  "meaning": "Итоги можно проверить: каждое число сложено по одной единице, и каждую единицу сделал человек. Из этих данных следует вывод про каждого, кто стоит у экрана.",
+  "why": "Ученый не верит на слово: сначала показывает, из чего сложено число, потом делает вывод. Время замера стоит на экране весь ролик, поэтому цифра честная, даже пока коды еще принимают.",
+  "device": "Каждое число начинается с одной единицы крупно: плашки пасхалки, стрелки спасибо, экрана ленты. Камера отъезжает к полю таких же, под чертой таблицы: «Итого: ты на хорошем счету»."
+ }
+};
+
+/* Page: variant switcher, player, storyboard, variant cards. Uses E and CONCEPTS. */
+(function () {
+  'use strict';
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var byId = {}; CONCEPTS.forEach(function (c) { byId[c.id] = c; });
+  var REC = CONCEPTS.filter(function (c) { return c.recommended; })[0] || CONCEPTS[0];
+  var cur = REC;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function fmt(x) { var neg = x < 0, v = neg ? Math.ceil(-x) : Math.floor(x), m = Math.floor(v / 60), s = v % 60; return (neg ? '−' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+
+  var screenEl = $('screen'), main = $('main'), mctx = main.getContext('2d');
+  var playBtn = $('play'), timeEl = $('time'), nameEl = $('sceneName'), toggleEl = $('toggle');
+  var btnW = $('modeWindow'), btnS = $('modeSolid'), tabsEl = $('tabs'), introEl = $('intro'), aboutEl = $('about'), boardEl = $('board'), boardSub = $('boardSub'), cardsEl = $('cards'), trackEl = $('track');
+  var t = cur.T0, playing = false, lastTs = 0, rafId = 0, mode = 'window', ready = false, mk = 1, resumeOnView = false, lastScene = null, wantPlay = false;
+  var tabBtns = [], segs = [], boardThumbs = [], cardThumbs = [], pairThumbs = [];
+
+  /* ---------- drawing ---------- */
+  function mdOf(c) { return c.hasMode ? mode : 'window'; }
+  function renderThumb(th) {
+    if (!ready) return;
+    var w = th.c.clientWidth; if (!w) return;
+    var dpr = Math.min(2, window.devicePixelRatio || 1), pw = Math.round(w * dpr), ph = Math.round(pw * 9 / 16);
+    if (th.c.width !== pw || th.c.height !== ph) { th.c.width = pw; th.c.height = ph; }
+    try { E.drawConcept(th.concept, th.c.getContext('2d'), pw / E.W, th.t, th.md || mdOf(th.concept)); } catch (e) { if (window.console) console.error(e); }
+  }
+  function renderAll(list) { list.forEach(renderThumb); }
+  function sceneAt(tt) { var sc = cur.scenes; for (var i = 0; i < sc.length; i++) { if (tt >= sc[i].a && tt < sc[i].b) return sc[i]; } return sc[sc.length - 1]; }
+  function updateUI() {
+    var s = sceneAt(t);
+    segs.forEach(function (g) { var p = Math.max(0, Math.min(1, (t - g.s.a) / (g.s.b - g.s.a))); g.f.style.width = (p * 100).toFixed(2) + '%'; g.b.classList.toggle('on', g.s === s); });
+    timeEl.textContent = fmt(Math.min(t, cur.VIDEO_END)) + ' / ' + fmt(cur.VIDEO_END); nameEl.textContent = s.title;
+    playBtn.classList.toggle('is-playing', playing);
+    playBtn.setAttribute('aria-label', playing ? 'Пауза' : (t >= cur.TEND - .01 ? 'Смотреть сначала' : 'Смотреть'));
+    if (s !== lastScene) { lastScene = s; main.setAttribute('aria-label', '«' + cur.name + '», кадр «' + s.title + '». На экране: ' + s.screen.join(' / ')); }
+  }
+  function drawMain() { if (!ready) return; try { E.drawConcept(cur, mctx, mk, t, mdOf(cur)); } catch (e) { if (window.console) console.error(e); } updateUI(); }
+  function loop(ts) { rafId = 0; if (!playing) return; var dt = lastTs ? Math.min(.1, (ts - lastTs) / 1000) : 0; lastTs = ts; t += dt; if (t >= cur.TEND) { t = cur.TEND; playing = false; } drawMain(); if (playing) rafId = requestAnimationFrame(loop); }
+  function play() { if (!ready) { wantPlay = true; return; } if (t >= cur.TEND - .01) t = cur.T0; playing = true; lastTs = 0; if (!rafId) rafId = requestAnimationFrame(loop); updateUI(); }
+  function pause() { playing = false; wantPlay = false; if (rafId) { cancelAnimationFrame(rafId); rafId = 0; } updateUI(); }
+  function seek(tt, andPlay) { t = Math.max(cur.T0, Math.min(cur.TEND, tt)); drawMain(); if (andPlay) play(); else updateUI(); }
+  function setMode(m) { mode = m; btnW.setAttribute('aria-pressed', String(m === 'window')); btnS.setAttribute('aria-pressed', String(m === 'solid')); drawMain(); if (cur.hasMode) renderAll(boardThumbs); }
+
+  /* ---------- building blocks ---------- */
+  function buildTabs() {
+    CONCEPTS.forEach(function (c, i) {
+      var b = el('button', 'tab'); b.type = 'button'; b.id = 'tab-' + c.id; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'panel');
+      if (c.recommended) { var d = el('span', 'dot'); d.setAttribute('aria-hidden', 'true'); b.appendChild(d); b.title = 'Рекомендуем'; }
+      b.appendChild(document.createTextNode(c.name));
+      b.addEventListener('click', function () { select(c.id, true); });
+      b.addEventListener('keydown', function (e) {
+        var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? CONCEPTS.length - 1 : null;
+        if (j == null) return; e.preventDefault(); j = (j + CONCEPTS.length) % CONCEPTS.length; tabBtns[j].focus(); select(CONCEPTS[j].id, true);
+      });
+      tabsEl.appendChild(b); tabBtns.push(b);
+    });
+  }
+  function renderTabs() { tabBtns.forEach(function (b, i) { var on = CONCEPTS[i] === cur; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; }); $('panel').setAttribute('aria-labelledby', 'tab-' + cur.id); }
+  var INTROS = (typeof INTRO === 'object' && INTRO) || {};
+  function renderIntro() {
+    introEl.textContent = '';
+    var row = el('div', 'row'); row.appendChild(el('span', 'eyebrow', 'Архетип: ' + cur.arch)); if (cur.recommended) row.appendChild(el('span', 'chip', 'Рекомендуем')); introEl.appendChild(row);
+    introEl.appendChild(el('h2', null, cur.name));
+    var x = INTROS[cur.id];
+    if (!x) { introEl.appendChild(el('p', 'idea', cur.idea)); return; }
+    var dl = el('dl', 'intro-grid');
+    [['Смысл', x.meaning], ['Почему так', x.why], ['Что придумали', x.device]].forEach(function (p) { var d = el('div'); d.appendChild(el('dt', null, p[0])); d.appendChild(el('dd', null, p[1])); dl.appendChild(d); });
+    introEl.appendChild(dl);
+  }
+  function renderAbout() {
+    aboutEl.textContent = '';
+    var m = el('div', 'about-main');
+    var dl = el('dl', 'sr');
+    function pair(dt, dd) { if (!dd) return; var d = el('div'); d.appendChild(el('dt', null, dt)); d.appendChild(el('dd', null, dd)); dl.appendChild(d); }
+    pair('Сильная сторона', cur.strong); pair('Риск', cur.risk); pair('В основу рекомендации вошло', cur.take);
+    m.appendChild(dl); aboutEl.appendChild(m);
+    var how = el('div', 'how');
+    (cur.how || []).forEach(function (h) { var d = el('div'); d.appendChild(el('h3', null, h.h)); d.appendChild(el('p', null, h.p)); how.appendChild(d); });
+    aboutEl.appendChild(how);
+  }
+  function renderTrack() {
+    trackEl.textContent = ''; segs = [];
+    cur.scenes.forEach(function (s) {
+      var b = el('button', 'seg'), i = el('i'), f = el('b'); b.type = 'button'; b.style.flex = (s.b - s.a) + ' 1 0'; b.title = s.title + ' · ' + s.time; b.setAttribute('aria-label', s.title + ', ' + s.time);
+      i.appendChild(f); b.appendChild(i); b.addEventListener('click', function () { seek(s.a + .001, playing || wantPlay); }); trackEl.appendChild(b); segs.push({ b: b, f: f, s: s });
+    });
+  }
+  function toPlayer() { screenEl.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); }
+  function renderBoard() {
+    boardEl.textContent = ''; boardThumbs = [];
+    boardSub.textContent = '«' + cur.name + '»: ' + cur.scenes.length + ' кадров от конца последнего круга до последнего кадра. Кадр открывается в ролике по нажатию.';
+    cur.scenes.forEach(function (s) {
+      var card = el('article', 'card'), b = el('button', 'thumb'), c = el('canvas');
+      b.type = 'button'; b.setAttribute('aria-label', 'Показать кадр «' + s.title + '» в ролике'); c.setAttribute('aria-hidden', 'true'); b.appendChild(c);
+      b.addEventListener('click', function () { seek(s.a + .001, true); toPlayer(); });
+      card.appendChild(b);
+      var meta = el('div', 'meta'); meta.appendChild(el('h3', null, s.title)); meta.appendChild(el('span', 'tc', s.time)); card.appendChild(meta);
+      var os = el('div', 'onscreen'); os.appendChild(el('span', 'lbl', 'На экране')); s.screen.forEach(function (l) { os.appendChild(el('span', null, l)); }); card.appendChild(os);
+      card.appendChild(el('p', 'd', s.text));
+      boardEl.appendChild(card); boardThumbs.push({ c: c, concept: cur, t: s.rep });
+    });
+    renderAll(boardThumbs);
+  }
+  function buildCards() {
+    CONCEPTS.forEach(function (c) {
+      var card = el('article', 'card' + (c.recommended ? ' rec' : '')), b = el('button', 'thumb'), cv = el('canvas');
+      b.type = 'button'; b.setAttribute('aria-label', 'Смотреть вариант «' + c.name + '»'); cv.setAttribute('aria-hidden', 'true'); b.appendChild(cv);
+      function open() { select(c.id, true); toPlayer(); }
+      b.addEventListener('click', open); card.appendChild(b);
+      var row = el('div', 'row'); row.appendChild(el('span', 'eyebrow', c.arch)); if (c.recommended) row.appendChild(el('span', 'chip', 'Рекомендуем')); card.appendChild(row);
+      card.appendChild(el('h3', 'alt-name', c.name));
+      card.appendChild(el('p', 'd', c.idea));
+      if (c.take) { var tk = el('p', 'd'); tk.appendChild(el('b', null, 'В основу вошло: ')); tk.appendChild(document.createTextNode(c.take)); card.appendChild(tk); }
+      var go = el('button', 'go', 'Смотреть в плеере'); go.type = 'button'; go.addEventListener('click', open); card.appendChild(go);
+      cardsEl.appendChild(card); cardThumbs.push({ c: cv, concept: c, t: c.keyT, md: 'window' });
+    });
+  }
+
+  function select(id, andPlay) {
+    var c = byId[id]; if (!c) return;
+    var same = c === cur;
+    pause(); cur = c; lastScene = null;
+    if (!same) t = cur.T0;
+    toggleEl.hidden = !cur.hasMode;
+    renderTabs(); renderIntro(); renderAbout(); renderTrack(); renderBoard();
+    try { if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id); } catch (e) { }
+    drawMain();
+    if (andPlay) { if (same) t = cur.T0; play(); }
+  }
+
+  /* ---------- sizing ---------- */
+  function resizeMain() {
+    var w = screenEl.getBoundingClientRect().width || main.clientWidth, dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (!w) { if (!E.S) E.buildSprites(1); return; }
+    var pw = Math.round(w * dpr), ph = Math.round(pw * 9 / 16); if (main.width !== pw || main.height !== ph) { main.width = pw; main.height = ph; }
+    mk = pw / E.W; var target = Math.max(.5, Math.min(1.4, mk)); if (!E.S || Math.abs(target - E.ks) / E.ks > .25) { E.buildSprites(target); prewarm(); }
+  }
+  /* builds every concept's cached art in small idle steps, so playback never stalls on first use */
+  var warmId = 0;
+  function prewarm() {
+    var id = ++warmId, list = CONCEPTS.slice(), cv = E.makeCanvas(192, 108), x = cv.getContext('2d');
+    function step() { if (id !== warmId) return; var c = list.shift(); if (!c) return; try { for (var tt = c.T0; tt <= c.TEND; tt += 1) E.drawConcept(c, x, .1, tt, 'window'); } catch (e) { } setTimeout(step, 40); }
+    setTimeout(step, 400);
+  }
+
+  /* ---------- boot ---------- */
+  buildTabs(); buildCards();
+  pairThumbs.push({ c: $('pairA'), concept: REC, t: 6, md: 'window' }, { c: $('pairB'), concept: REC, t: 6, md: 'solid' });
+  var start = (location.hash || '').replace('#', ''); if (byId[start]) cur = byId[start];
+  t = cur.T0; toggleEl.hidden = !cur.hasMode; renderTabs(); renderIntro(); renderAbout(); renderTrack(); renderBoard(); updateUI();
+
+  playBtn.addEventListener('click', function () { if (playing) pause(); else play(); });
+  btnW.addEventListener('click', function () { setMode('window'); });
+  btnS.addEventListener('click', function () { setMode('solid'); });
+  window.addEventListener('hashchange', function () { var id = (location.hash || '').replace('#', ''); if (byId[id] && byId[id] !== cur) select(id, false); });
+
+  function init() {
+    if (ready) return; ready = true; E.measure(); resizeMain();
+    renderAll(boardThumbs); renderAll(cardThumbs); renderAll(pairThumbs);
+    if (reduce && !wantPlay) { t = cur.keyT; drawMain(); } else { t = cur.T0; drawMain(); play(); }
+    var rT = 0; function onResize() { clearTimeout(rT); rT = setTimeout(function () { resizeMain(); drawMain(); renderAll(boardThumbs); renderAll(cardThumbs); renderAll(pairThumbs); }, 140); }
+    if ('ResizeObserver' in window) { var ro = new ResizeObserver(onResize); ro.observe(screenEl); ro.observe(boardEl); ro.observe(cardsEl); } else window.addEventListener('resize', onResize);
+    if ('IntersectionObserver' in window) { new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting && playing) { resumeOnView = true; pause(); } else if (e.isIntersecting && resumeOnView) { resumeOnView = false; play(); } }); }, { threshold: .15 }).observe(screenEl); }
+  }
+  var loads = [];
+  try { if (document.fonts && document.fonts.load) { var smp = '0123456789 Имен в титрах «»—→·:!+,'; ['400', '500', '600', '700'].forEach(function (w) { loads.push(document.fonts.load(w + ' 40px "Golos Text"', smp)); }); ['700', '800', '900'].forEach(function (w) { loads.push(document.fonts.load(w + ' 100px "Sofia Sans Condensed"', smp)); }); } } catch (e) { }
+  Promise.race([Promise.all(loads), new Promise(function (r) { setTimeout(r, 2500); })]).then(init, init);
+})();
+
+</script>
+
+</body></html>
