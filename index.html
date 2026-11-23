@@ -173,6 +173,15 @@ h2{font-weight:600;letter-spacing:-.02em}
 .pill.minus b{color:var(--accent)}
 .card .pm{gap:6px}
 .card .pill{font-size:13.5px;padding:6px 10px;border-radius:10px}
+
+/* Three favourites */
+.tab.fav{background:#EEFFB8;border-color:#EEFFB8;font-weight:600}
+.tab.fav:hover{border-color:var(--lime)}
+.tab.fav[aria-selected="true"]{background:var(--lime);border-color:var(--lime)}
+.tab .crown{flex:none;fill:var(--accent);margin-left:-2px}
+.tab-sep{align-self:stretch;width:2px;border-radius:2px;background:var(--line);margin:6px 8px}
+.alt-name .crown{fill:var(--accent);margin-right:10px;vertical-align:0}
+.card.fav .thumb{box-shadow:0 0 0 3px var(--lime)}
 </style>
 
 <div class="wrap">
@@ -1607,8 +1616,8 @@ function registerConcept(c) { CONCEPTS.push(c); }
 })();
 
 /* ---- 04_pioneer.js ---- */
-/* Первопроходец: «Лента становится дорого́й». Лента встает, ее разделительная линия поворачивает вправо
-   и становится дорого́й. Цифры встают на нее отметками одного размера, последняя «1». Дальше пунктир.
+/* Первопроходец: «Лента становится дорóгой». Лента встает, ее разделительная линия поворачивает вправо
+   и становится дорóгой. Цифры встают на нее отметками одного размера, последняя «1». Дальше пунктир.
    Brand: the road is the lime header of the next circle that comes up under the last purple block and
    flattens into a lime strip (a panel of the tape, 16 px under the block). Ticks are dark rounded bars,
    numbers grow out of the strip, labels appear through the scramble. The phrase and the end frame
@@ -1819,8 +1828,8 @@ function registerConcept(c) { CONCEPTS.push(c); }
   registerConcept({
     id: 'pioneer',
     arch: 'Первопроходец',
-    name: 'Лента становится дорого́й',
-    idea: 'Лента впервые за три дня останавливается, а ее разделительная линия поворачивает вправо и становится дорого́й. Итоги встают на нее отметками одного размера, в конце сплошной линии самая крупная отметка: «1 / ' + ONE_CAP + '». Справа дорога уходит за край пунктиром, без обещаний.',
+    name: 'Лента становится дорóгой',
+    idea: 'Лента впервые за три дня останавливается, а ее разделительная линия поворачивает вправо и становится дорóгой. Итоги встают на нее отметками одного размера, в конце сплошной линии самая крупная отметка: «1 / ' + ONE_CAP + '». Справа дорога уходит за край пунктиром, без обещаний.',
     strong: 'Самый надежный шаблон: без имен и текстур внутри цифр, лучшая читаемость с 10 метров. Все отметки одной высоты, поэтому скромная цифра не выглядит недобором.',
     risk: 'Смысл держится на событии сильнее, чем в других вариантах: человек появляется только в «1». «Первый состав» и пунктир справа можно услышать как намек на продолжение, хотя про следующий год на экране ни слова.',
     take: 'Правила размеров и надежность шаблона: все цифры одной высоты, появляются целиком и стоят не меньше 5 секунд.',
@@ -2478,7 +2487,7 @@ var INTRO = {
   "minus": ["Деньги рядом со спасибо", "Можно прочитать как «спасибо вместо премии»"]
  },
  "pioneer": {
-  "one": "Лента поворачивает и становится дорого́й, а цифры встают на нее отметками.",
+  "one": "Лента поворачивает и становится дорóгой, а цифры встают на нее отметками.",
   "plus": ["Самый надежный шаблон", "Лучше всех читается издалека"],
   "minus": ["Больше про праздник, чем про людей", "Пунктир намекает на следующий год"]
  },
@@ -2498,12 +2507,22 @@ var INTRO = {
 (function () {
   'use strict';
   var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  /* order of the creative partner: the three favourites first, then the rest */
+  var ORDER = ['everyperson', 'after-credits', 'athlete', 'matchmaker', 'translator', 'pioneer', 'scientist'];
+  var TOP = { 'everyperson': 1, 'after-credits': 1, 'athlete': 1 };
+  CONCEPTS.sort(function (a, b) { var i = ORDER.indexOf(a.id), j = ORDER.indexOf(b.id); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); });
   var byId = {}; CONCEPTS.forEach(function (c) { byId[c.id] = c; });
   var REC = CONCEPTS.filter(function (c) { return c.recommended; })[0] || CONCEPTS[0];
-  var cur = REC;
+  var cur = CONCEPTS[0];
 
   function $(id) { return document.getElementById(id); }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  /* small crown for the three favourites */
+  function crown() {
+    var NS = 'http://www.w3.org/2000/svg', s = document.createElementNS(NS, 'svg'), p = document.createElementNS(NS, 'path');
+    s.setAttribute('viewBox', '0 0 20 16'); s.setAttribute('width', '20'); s.setAttribute('height', '16'); s.setAttribute('class', 'crown'); s.setAttribute('aria-hidden', 'true');
+    p.setAttribute('d', 'M1.5 4.2l4.6 3.6L10 1.2l3.9 6.6 4.6-3.6-1.7 8.6H3.2zM3.4 14h13.2v1.6H3.4z'); s.appendChild(p); return s;
+  }
   function fmt(x) { var neg = x < 0, v = neg ? Math.ceil(-x) : Math.floor(x), m = Math.floor(v / 60), s = v % 60; return (neg ? '−' : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 
   var screenEl = $('screen'), main = $('main'), mctx = main.getContext('2d');
@@ -2541,8 +2560,8 @@ var INTRO = {
   /* ---------- building blocks ---------- */
   function buildTabs() {
     CONCEPTS.forEach(function (c, i) {
-      var b = el('button', 'tab'); b.type = 'button'; b.id = 'tab-' + c.id; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'panel');
-      if (c.recommended) { var d = el('span', 'dot'); d.setAttribute('aria-hidden', 'true'); b.appendChild(d); b.title = 'Рекомендуем'; }
+      var b = el('button', 'tab' + (TOP[c.id] ? ' fav' : '')); b.type = 'button'; b.id = 'tab-' + c.id; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'panel');
+      if (TOP[c.id]) { b.appendChild(crown()); b.title = 'Лучшие три'; }
       b.appendChild(document.createTextNode(c.name));
       b.addEventListener('click', function () { select(c.id, true); });
       b.addEventListener('keydown', function (e) {
@@ -2550,6 +2569,7 @@ var INTRO = {
         if (j == null) return; e.preventDefault(); j = (j + CONCEPTS.length) % CONCEPTS.length; tabBtns[j].focus(); select(CONCEPTS[j].id, true);
       });
       tabsEl.appendChild(b); tabBtns.push(b);
+      if (TOP[c.id] && !TOP[(CONCEPTS[i + 1] || {}).id]) { var sep = el('span', 'tab-sep'); sep.setAttribute('aria-hidden', 'true'); tabsEl.appendChild(sep); }
     });
   }
   function renderTabs() { tabBtns.forEach(function (b, i) { var on = CONCEPTS[i] === cur; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; }); $('panel').setAttribute('aria-labelledby', 'tab-' + cur.id); }
@@ -2611,7 +2631,7 @@ var INTRO = {
       function open() { select(c.id, true); toPlayer(); }
       b.addEventListener('click', open); card.appendChild(b);
       var row = el('div', 'row'); row.appendChild(el('span', 'eyebrow', c.arch)); if (c.recommended) row.appendChild(el('span', 'chip', 'Рекомендуем')); card.appendChild(row);
-      card.appendChild(el('h3', 'alt-name', c.name));
+      var h = el('h3', 'alt-name'); if (TOP[c.id]) { h.appendChild(crown()); card.classList.add('fav'); } h.appendChild(document.createTextNode(c.name)); card.appendChild(h);
       var xi = INTROS[c.id];
       card.appendChild(el('p', 'one-s', xi ? xi.one : c.idea));
       if (xi) card.appendChild(pills(xi));
