@@ -423,9 +423,7 @@ h2{font-weight:600;letter-spacing:-.02em}
       <li data-ts="13.5,23,33">
         <div class="tr-main">
           <h3>Подписи к числам</h3>
-          <p>Число стоит на обороте плашки. Оно отвечает на пару, которая была перед ним: сколько раз это случилось.</p>
-          <p class="fx"><b>Поправили в дизайне.</b> Раньше стрелка к этому моменту уходила, и было непонятно, что число продолжает пару. Это задача дизайна, не текста. Теперь стрелка остается наверху кадра, между словами пары. Кадры ниже уже новые.</p>
-          <p>Коины стоят рядом со спасибо: это не должно читаться как «спасибо вместо премии».</p>
+          <p>Число стоит на обороте плашки. Оно отвечает на пару, которая была перед ним: сколько раз это случилось. Пара со стрелкой остается наверху кадра. Коины стоят рядом со спасибо: это не должно читаться как «спасибо вместо премии».</p>
           <p class="todo"><b>Что написать:</b> подпись к каждому числу. Она продолжает пару и подходит к любому числу: его подставим 4 декабря. Числа можно взять другие, если они нужны истории.</p>
           <div class="tr-count">
             <span class="lbl">Что можем посчитать</span>
@@ -3093,7 +3091,6 @@ var INTRO = {
         b.type = 'button'; b.setAttribute('aria-label', 'Показать кадр «' + s.title + '» в ролике'); c.setAttribute('aria-hidden', 'true'); b.appendChild(c);
         b.addEventListener('click', function () { if (cur !== d) select(d.id, false); seek(tt, true); toPlayer(); });
         cap.appendChild(el('b', null, s.title)); cap.appendChild(document.createTextNode(s.time));
-        if (s.fix) { f.classList.add('fixed'); b.appendChild(el('span', 'fx-badge', 'Изменили')); }
         f.appendChild(b); f.appendChild(cap); box.appendChild(f); taskThumbs.push({ c: c, concept: d, t: tt });
       });
       var n = li.getAttribute('data-note'); if (n) box.appendChild(el('p', 'tr-fnote', n));
