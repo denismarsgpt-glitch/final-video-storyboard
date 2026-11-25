@@ -264,6 +264,19 @@ h2{font-weight:600;letter-spacing:-.02em}
 .tr-count .pill{font-size:13.5px;padding:6px 10px;border-radius:10px}
 .tr-count .pill.check{background:var(--bg-soft,#EEF3F9)}
 .tr-count .d{color:var(--muted);font-size:14px}
+
+/* v16: idea of the draft, silent note */
+.task-idea{background:var(--surface);border-radius:22px;padding:24px 26px;display:flex;flex-direction:column;gap:12px}
+.task-idea .lbl{font-weight:500;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.task-idea .lead2{font-size:clamp(18px,2vw,22px);font-weight:600;line-height:1.3;max-width:52ch}
+.idea-steps{margin:0;padding:0;list-style:none;counter-reset:is;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px 22px}
+.idea-steps>li{counter-increment:is;position:relative;padding-left:38px;min-height:26px;font-size:15.5px;line-height:1.45}
+.idea-steps>li::before{content:counter(is);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:8px;background:var(--lime);display:grid;place-items:center;font-weight:600;font-size:14px}
+.idea-steps b{font-weight:600}
+.silent{display:flex;align-items:center;gap:14px;background:var(--fg);color:#fff;border-radius:18px;padding:14px 20px}
+.silent svg{flex:none;color:var(--lime)}
+.silent p{font-size:15.5px;line-height:1.4;color:#fff}
+.silent b{font-weight:600}
 </style>
 
 <div class="wrap">
@@ -314,7 +327,24 @@ h2{font-weight:600;letter-spacing:-.02em}
       <p class="eyebrow">К черновику финала · срок 27 ноября</p>
       <h2 id="h-task">Задание копирайтеру</h2>
       <p>Нужен сценарий финального ролика: что написано в каждом кадре. Черновик есть, но истории в нем нет. Придумай ее и перепиши кадры.</p>
-      <p>Ролик идет без звука, его смотрят издалека и на ходу. Все держится на тексте и движении: чем короче строка, тем лучше.</p>
+    </div>
+
+    <div class="task-idea">
+      <span class="lbl">Идея черновика</span>
+      <p class="lead2">Первый Главный банковский день состоялся, и его заметили. Ролик показывает это стрелкой: что от кого к кому пришло за три дня.</p>
+      <ol class="idea-steps">
+        <li><b>Стрелка.</b> Крупно два слова и стеклянная стрелка между ними: «Титры → каждому».</li>
+        <li><b>Число.</b> Лаймовая плашка переворачивается, на обороте число: имена в титрах.</li>
+        <li><b>Так три раза.</b> «Титры → внимательным» и пасхалки, «Коллега → коллеге» и спасибо.</li>
+        <li><b>Кто кому.</b> Настоящие имена из спасибо, одно за другим.</li>
+        <li><b>Друг у друга.</b> Стрелка смотрит в обе стороны: «Весь банк на хорошем счету друг у друга».</li>
+        <li><b>Последний кадр.</b> «С главным банковским днем!», числа и код пасхалки. Стоит на экранах до конца дня.</li>
+      </ol>
+    </div>
+
+    <div class="silent">
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m23 9-6 6"/><path d="m17 9 6 6"/></svg>
+      <p><b>Ролик идет без звука.</b> Его смотрят издалека и на ходу. Все держится на тексте и движении: чем короче строка, тем лучше.</p>
     </div>
 
     <div class="task-q">
