@@ -289,6 +289,14 @@ h2{font-weight:600;letter-spacing:-.02em}
 .tr-pairs dd{margin:0}
 .tr-main .task-list li{font-size:15.5px}
 @media (max-width:560px){.tr-pairs{grid-template-columns:minmax(0,1fr);gap:2px}.tr-pairs dd{margin-bottom:8px}}
+
+/* v21: what we changed in the design, marked red */
+:root{--red:#D92B20}
+.fx{background:#FDECEA;border-left:3px solid var(--red);border-radius:0 12px 12px 0;padding:10px 14px;font-size:15px;line-height:1.4;color:var(--fg)}
+.fx b{font-weight:600;color:#B3211A}
+.fixed .thumb{box-shadow:0 0 0 3px var(--red)}
+.fixed .thumb:hover{box-shadow:0 0 0 3px var(--red)}
+.fx-badge{position:absolute;left:8px;bottom:8px;background:var(--red);color:#fff;font-size:12px;font-weight:600;line-height:1;padding:5px 8px;border-radius:7px;z-index:1}
 </style>
 
 <div class="wrap">
@@ -346,7 +354,7 @@ h2{font-weight:600;letter-spacing:-.02em}
       <p class="lead2">Первый Главный банковский день состоялся, и его заметили. Ролик показывает это стрелкой: что от кого к кому пришло за три дня.</p>
       <ol class="idea-steps">
         <li><b>Стрелка.</b> Крупно два слова и стеклянная стрелка между ними: «Титры → каждому».</li>
-        <li><b>Число.</b> Лаймовая плашка переворачивается, на обороте число: имена в титрах.</li>
+        <li><b>Число.</b> Лаймовая плашка переворачивается, на обороте число: имена в титрах. Пара со стрелкой остается наверху.</li>
         <li><b>Так три раза.</b> «Титры → внимательным» и пасхалки, «Коллега → коллеге» и спасибо.</li>
         <li><b>Кто кому.</b> Настоящие имена из спасибо, одно за другим.</li>
         <li><b>Друг у друга.</b> Стрелка смотрит в обе стороны: «Весь банк на хорошем счету друг у друга».</li>
@@ -415,7 +423,9 @@ h2{font-weight:600;letter-spacing:-.02em}
       <li data-ts="13.5,23,33">
         <div class="tr-main">
           <h3>Подписи к числам</h3>
-          <p>Число стоит на обороте плашки, а стрелка к этому моменту уже ушла. Непонятно, что оно считает: сколько раз прошла стрелка? Коины стоят рядом со спасибо: это не должно читаться как «спасибо вместо премии».</p>
+          <p>Число стоит на обороте плашки. Оно отвечает на пару, которая была перед ним: сколько раз это случилось.</p>
+          <p class="fx"><b>Поправили в дизайне.</b> Раньше стрелка к этому моменту уходила, и было непонятно, что число продолжает пару. Это задача дизайна, не текста. Теперь стрелка остается наверху кадра, между словами пары. Кадры ниже уже новые.</p>
+          <p>Коины стоят рядом со спасибо: это не должно читаться как «спасибо вместо премии».</p>
           <p class="todo"><b>Что написать:</b> подпись к каждому числу. Она продолжает пару и подходит к любому числу: его подставим 4 декабря. Числа можно взять другие, если они нужны истории.</p>
           <div class="tr-count">
             <span class="lbl">Что можем посчитать</span>
@@ -2756,8 +2766,14 @@ function registerConcept(c) { CONCEPTS.push(c); }
   }
   function numberPage(ctx, r, tt, t0, head, label, sub, num, a) {
     if (!(a > 0)) return;
-    text(ctx, head, r.x + 40, r.y + 66, '600 42px ' + FB, 'left', a);
-    text(ctx, DATA, r.x + r.w - 40, r.y + 62, '500 32px ' + FB, 'right', a * .55);
+    /* the pair stays on top with the glass arrow between its words, so the number reads as its answer */
+    var pr = head.split(' → '), fs = 84, gap, al, wa, wb, tot, room = r.w - 80;
+    for (var q = 0; q < 6; q++) { ctx.font = '600 ' + fs + 'px ' + FB; wa = ctx.measureText(pr[0]).width; wb = ctx.measureText(pr[1]).width; gap = fs * .3; al = fs * 2.3; tot = wa + wb + al + gap * 2; if (tot <= room) break; fs = Math.floor(fs * room / tot); }
+    var hx = r.x + 40, hy = r.y + 34 + fs, ins = ease((tt - t0) / .7), ax0 = hx + wa + gap, ax1 = ax0 + al * lerp(.25, 1, ins);
+    text(ctx, pr[0], hx, hy, '600 ' + fs + 'px ' + FB, 'left', a);
+    text(ctx, pr[1], hx + wa + gap * 2 + al, hy, '600 ' + fs + 'px ' + FB, 'left', a * ins);
+    glassArrow(ctx, right(ax0 + fs * .2, ax1 - fs * .2, hy - fs * .34, fs * .36), fs * .4, a, [ax1 - fs * .45, hy - fs * .34]);
+    text(ctx, DATA, r.x + 40, hy + 58, '500 30px ' + FB, 'left', a * .55);
     text(ctx, sc(label, tt, t0 + .1, .7, 41), r.x + 40, r.y + 516, '600 62px ' + FB, 'left', a);
     if (sub) text(ctx, sc(sub, tt, t0 + .3, .8, 42), r.x + r.w - 40, r.y + 512, '500 40px ' + FB, 'right', a * .85);
     var font = E.fitFont(ctx, num, 600, FD, 620, r.w - 80);
@@ -2869,11 +2885,11 @@ function registerConcept(c) { CONCEPTS.push(c); }
       { a: 0, b: 4.5, rep: 3.2, title: 'Итоги трех дней', time: '0:00–0:04', screen: ['2–4 декабря', 'Итоги / трех дней'], text: 'Снизу въезжает лаймовая плашка на весь экран, по ней снизу вверх бегут имена. Заголовок проявляется из случайных букв.' },
       { a: 4.5, b: 7.5, rep: 5.0, title: 'Стрелка пролетает', time: '0:04–0:07', screen: ['Итоги / трех дней'], text: 'Стеклянная стрелка пролетает слева направо и искажает текст под собой. Плашка схлопывается в полоску среди шести серых панелей и снова разворачивается.' },
       { a: 7.5, b: 10.5, rep: 9.2, title: 'Титры → каждому', time: '0:07–0:10', screen: ['Титры', 'каждому'], text: 'Крупно «Титры» и «каждому», между ними стеклянная стрелка. Она медленно сползает по диагонали: сначала задевает «Титры», потом «каждому».' },
-      { a: 10.5, b: 15.5, rep: 13.5, title: 'Имена', time: '0:10–0:15', screen: ['Титры → каждому', DATA, 'Имена в титрах', N1], text: 'Плашка переворачивается. На обороте подпись и число, оно проявляется так же, как заголовки в титрах.' },
+      { a: 10.5, b: 15.5, rep: 13.5, title: 'Имена', fix: 'Вернули стрелку наверх кадра. Раньше пара стояла там мелкой строкой, стрелка уходила, и связь пары с числом терялась. Теперь над числом те же два слова и стеклянная стрелка между ними.', time: '0:10–0:15', screen: ['Титры → каждому', DATA, 'Имена в титрах', N1], text: 'Плашка переворачивается. На обороте подпись и число, оно проявляется так же, как заголовки в титрах.' },
       { a: 15.5, b: 20.0, rep: 18.8, title: 'Титры → внимательным', time: '0:15–0:20', screen: ['Титры', 'внимательным'], text: 'Плашка схлопывается в полоску, переезжает и разворачивается справа. Та же стрелка, теперь «внимательным».' },
-      { a: 20.0, b: 25.0, rep: 23.0, title: 'Пасхалки', time: '0:20–0:25', screen: ['Титры → внимательным', DATA, 'Находки пасхалок: счет еще идет', N2], text: 'Переворот, на обороте число найденных пасхалок.' },
+      { a: 20.0, b: 25.0, rep: 23.0, title: 'Пасхалки', fix: 'Вернули стрелку наверх кадра. Раньше пара стояла там мелкой строкой, стрелка уходила, и связь пары с числом терялась. Теперь над числом те же два слова и стеклянная стрелка между ними.', time: '0:20–0:25', screen: ['Титры → внимательным', DATA, 'Находки пасхалок: счет еще идет', N2], text: 'Переворот, на обороте число найденных пасхалок.' },
       { a: 25.0, b: 29.5, rep: 28.2, title: 'Коллега → коллеге', time: '0:25–0:29', screen: ['Коллега', 'коллеге'], text: 'Третья стрелка: от коллеги коллеге.' },
-      { a: 29.5, b: 34.8, rep: 33.0, title: 'Спасибо', time: '0:29–0:35', screen: ['Коллега → коллеге', DATA, 'Спасибо сказано', 'И с ними больше ' + D.coins + ' коинов', N3], text: 'Плашка переворачивается и уезжает влево. На обороте число спасибо, коины мелко справа.' },
+      { a: 29.5, b: 34.8, rep: 33.0, title: 'Спасибо', fix: 'Вернули стрелку наверх кадра. Раньше пара стояла там мелкой строкой, стрелка уходила, и связь пары с числом терялась. Теперь над числом те же два слова и стеклянная стрелка между ними.', time: '0:29–0:35', screen: ['Коллега → коллеге', DATA, 'Спасибо сказано', 'И с ними больше ' + D.coins + ' коинов', N3], text: 'Плашка переворачивается и уезжает влево. На обороте число спасибо, коины мелко справа.' },
       { a: 34.8, b: 41.6, rep: 37.2, title: 'Кто кому', time: '0:35–0:42', screen: ['Сергей / Комаров', 'Кириллу / Орлову'], text: 'Плашка на весь экран. Слева имя автора спасибо, справа снизу вверх едет список адресатов, имя напротив стрелки темное. После последнего имени стрелка улетает направо.' },
       { a: 41.6, b: 48, rep: 46.0, title: 'Друг у друга', time: '0:42–0:48', screen: ['Весь банк / на хорошем счету / друг у друга'], text: 'Плашка снова сжимается в полоску и разворачивается между двумя узкими панелями. Стрелка становится двусторонней. Вместо логотипа банка заглушка.' },
       { a: 48, b: 56, rep: 51.0, title: 'Последний кадр', time: '0:48 и до конца дня', screen: ['С главным / банковским днем!', N1 + ' имен', N2 + ' промокодов', N3 + ' спасибо', 'Счет еще идет', 'Введи код пасхалки на сайте праздника'], text: 'Лаймовая плашка уезжает влево вверх, текст меняется на поздравление. Серая панель делится на три, на них итоги. Снизу появляется белая плашка с кодом пасхалки и QR.' }
@@ -3044,6 +3060,7 @@ var INTRO = {
       var meta = el('div', 'meta'); meta.appendChild(el('h3', null, s.title)); meta.appendChild(el('span', 'tc', s.time)); card.appendChild(meta);
       var os = el('div', 'onscreen'); os.appendChild(el('span', 'lbl', 'На экране')); s.screen.forEach(function (l) { os.appendChild(el('span', null, l)); }); card.appendChild(os);
       card.appendChild(el('p', 'd', s.text));
+      if (s.fix) { card.classList.add('fixed'); b.appendChild(el('span', 'fx-badge', 'Изменили')); var fx = el('p', 'fx'); fx.appendChild(el('b', null, 'Что изменили. ')); fx.appendChild(document.createTextNode(s.fix)); card.appendChild(fx); }
       boardEl.appendChild(card); boardThumbs.push({ c: c, concept: cur, t: s.rep });
     });
     renderAll(boardThumbs);
@@ -3076,6 +3093,7 @@ var INTRO = {
         b.type = 'button'; b.setAttribute('aria-label', 'Показать кадр «' + s.title + '» в ролике'); c.setAttribute('aria-hidden', 'true'); b.appendChild(c);
         b.addEventListener('click', function () { if (cur !== d) select(d.id, false); seek(tt, true); toPlayer(); });
         cap.appendChild(el('b', null, s.title)); cap.appendChild(document.createTextNode(s.time));
+        if (s.fix) { f.classList.add('fixed'); b.appendChild(el('span', 'fx-badge', 'Изменили')); }
         f.appendChild(b); f.appendChild(cap); box.appendChild(f); taskThumbs.push({ c: c, concept: d, t: tt });
       });
       var n = li.getAttribute('data-note'); if (n) box.appendChild(el('p', 'tr-fnote', n));
