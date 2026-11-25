@@ -277,6 +277,18 @@ h2{font-weight:600;letter-spacing:-.02em}
 .silent svg{flex:none;color:var(--lime)}
 .silent p{font-size:15.5px;line-height:1.4;color:#fff}
 .silent b{font-weight:600}
+
+/* v20: structured row 2 */
+.tr-scheme{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-weight:600;font-size:15px;margin:4px 0 2px}
+.tr-scheme span{background:var(--lime);border-radius:10px;padding:6px 12px}
+.tr-scheme .num{background:var(--fg);color:#fff}
+.tr-scheme i{font-style:normal;font-weight:500;color:var(--muted)}
+.tr-sub{font-weight:500;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:10px}
+.tr-pairs{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;font-size:15.5px;line-height:1.4}
+.tr-pairs dt{font-weight:600}
+.tr-pairs dd{margin:0}
+.tr-main .task-list li{font-size:15.5px}
+@media (max-width:560px){.tr-pairs{grid-template-columns:minmax(0,1fr);gap:2px}.tr-pairs dd{margin-bottom:8px}}
 </style>
 
 <div class="wrap">
@@ -378,10 +390,24 @@ h2{font-weight:600;letter-spacing:-.02em}
       <li data-ts="9.2,18.8,28.2">
         <div class="tr-main">
           <h3>Пары для стрелки</h3>
-          <p>Стрелка это главный прием ролика, она остается. Она показывает движение: кто-то дал, кому-то пришло. Пара это два слова по краям стрелки: слева кто дает, справа кто получает. После пары идет число: сколько раз это случилось.</p>
-          <p>Сейчас пары значат вот что. «Титры → каждому»: титры назвали по имени каждого сотрудника. «Титры → внимательным»: в титрах были пасхалки, их нашли внимательные. «Коллега → коллеге»: люди сказали друг другу спасибо.</p>
-          <p>Проблема: первые две пары без этого объяснения не понять. «Титры» не человек, и что они дают, не сказано. Третья понятна сразу.</p>
-          <p class="todo"><b>Что написать:</b> свои пары вместо этих, копировать их не нужно. Хорошая пара понятна без объяснений: видно, кто дает и кто получает, а число после нее читается как ответ. Сколько пар и как они идут, решаешь ты. С каждой стороны одно-два коротких слова: их читают с 10 метров.</p>
+          <p>Стрелка это главный прием ролика, она остается. Она показывает движение: кто-то дал, кому-то пришло.</p>
+          <div class="tr-scheme" aria-label="Как устроена пара"><span>Кто дает</span><i aria-hidden="true">→</i><span>Кто получает</span><i aria-hidden="true">потом</i><span class="num">Число: сколько раз</span></div>
+          <span class="tr-sub">Что пары значат сейчас</span>
+          <dl class="tr-pairs">
+            <dt>Титры → каждому</dt><dd>Титры назвали по имени каждого сотрудника.</dd>
+            <dt>Титры → внимательным</dt><dd>В титрах были пасхалки, их нашли внимательные.</dd>
+            <dt>Коллега → коллеге</dt><dd>Люди сказали друг другу спасибо.</dd>
+          </dl>
+          <span class="tr-sub">В чем проблема</span>
+          <p>Первые две пары без этого объяснения не понять. «Титры» не человек, и что они дают, не сказано. Третья понятна сразу.</p>
+          <span class="tr-sub">Что написать</span>
+          <ul class="task-list">
+            <li>Свои пары вместо этих. Копировать их не нужно.</li>
+            <li>Пара понятна без объяснений: видно, кто дает и кто получает.</li>
+            <li>Число после пары читается как ответ.</li>
+            <li>С каждой стороны одно-два коротких слова: их читают с 10 метров.</li>
+            <li>Сколько пар и как они идут, решаешь ты.</li>
+          </ul>
         </div>
         <div class="tr-now"><span class="lbl">Сейчас в кадре</span><span>Титры → каждому</span><span>Титры → внимательным</span><span>Коллега → коллеге</span></div>
         <div class="tr-frames"></div>
