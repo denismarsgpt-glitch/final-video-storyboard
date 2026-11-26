@@ -304,7 +304,7 @@ h2{font-weight:600;letter-spacing:-.02em}
     <header class="head">
       <p class="eyebrow">ОТП Банк · Главный банковский день · финальный ролик</p>
       <h1>Финальный ролик</h1>
-      <p class="lead">4 декабря около 16:40, сразу после последнего круга титров, без звука. В работе черновик финального дизайна: «Стрелка спасибо» в версии дизайнеров, он первый в переключателе. Дальше семь исходных вариантов, три лучших с короной.</p>
+      <p class="lead">4 декабря около 16:40, сразу после последнего круга титров, без звука. Первым в переключателе стоит черновик с текстами копирайтера от 26 ноября. За ним прежний черновик дизайнеров и задание копирайтеру. Дальше семь исходных вариантов, три лучших с короной.</p>
       <p class="note">Цифры условные. Кадры собраны в стиле титров праздника: цвета, шрифт Onest, панели, плашка «отличных» и чип «Сейчас в титрах» взяты из дизайна. Движение схематичное, финальную анимацию делает моушн-дизайнер. Вместо логотипа банка стоит заглушка.</p>
     </header>
 
@@ -502,7 +502,7 @@ h2{font-weight:600;letter-spacing:-.02em}
 
 
 
-  <p class="foot">Pinkman · 25 ноября 2026 · черновик финала и задание копирайтеру</p>
+  <p class="foot">Pinkman · 26 ноября 2026 · черновик финала, задание копирайтеру и ее тексты</p>
 </div>
 
 <script>
@@ -2907,6 +2907,241 @@ function registerConcept(c) { CONCEPTS.push(c); }
   });
 })();
 
+/* ---- 08_matchmaker_script.js ---- */
+/* Тот же черновик дизайн-команды, но с текстами копирайтера от 26 ноября: 12 кадров сценария.
+   Время старого черновика сохранено: новые кадры вставлены паузами (HOLD), лишние секунды вырезаны из неподвижных мест (CUT).
+   Исходник: Figma «OTP [inner] Design file 2026», секция «the end» (16351:1012), кадры 01–14 и пометки.
+   Шесть серых панелей, по ним ходит лаймовая плашка: схлопывается в полоску и разворачивается.
+   Стеклянная стрелка «Титры ↘ каждому», плашка переворачивается, на обороте число. Потом «кто → кому», «друг у друга», последний кадр. */
+(function () {
+  'use strict';
+  var D = E.D, FB = E.FB, FD = E.FD, COL = E.COL, win = E.win, text = E.text, ease = E.ease, lerp = E.lerp, clamp = E.clamp;
+  var NB = E.NB;
+  /* edits of the old timeline: [old time, delta]. delta > 0 holds the frame, delta < 0 skips a still stretch */
+  var EDITS = [[13.0, -1.3], [22.5, -1.3], [25.0, 5.5], [32.5, -1.3], [40.9, 1.5], [45.5, -1.0]];
+  function old(tt) { var sh = 0; for (var i = 0; i < EDITS.length; i++) { var e = EDITS[i], at = e[0] + sh; if (tt <= at) break; if (e[1] > 0 && tt < at + e[1]) return e[0]; sh += e[1]; } return tt - sh; }
+  function N(o) { var sh = 0; for (var i = 0; i < EDITS.length; i++) { var e = EDITS[i]; if (o <= e[0]) break; if (e[1] < 0 && o < e[0] - e[1]) return e[0] + sh; sh += e[1]; } return o + sh; }
+  var JT = N(25.0), JE = JT + 5.5;                                  // the joke frame
+  var VIDEO_END = N(48), TEND = N(56);
+  var JOKE1 = 'Отдельное спасибо Игорю, который три дня никому не говорил коды от пасхалок.', JOKE2 = 'Вот чему учит работа в банке.';
+  var QUOTE = '«Спасибо, что выручила с отчетом в пятницу»';
+  function plain(s) { return String(s).split(NB).join(''); }      // в макете числа без пробела: 7412
+  var N1 = plain(D.names), N2 = plain(D.eggs), N3 = plain(D.thanks);
+  var DATA = 'Данные на ' + D.dataTime + ' по Москве';
+
+  /* ---------- the grid of six columns and the lime plate ---------- */
+  function colX(i) { return 20 + i * 316; }
+  function R(x, y, w, h) { return { x: x, y: y, w: w, h: h }; }
+  var FULL = R(20, 20, 1880, 1040);
+  function STRIP(i) { return R(colX(i), 20, 300, 1040); }
+  function SPAN(a, b) { return R(colX(a), 20, colX(b) + 300 - colX(a), 1040); }
+  var MID = R(186, 20, 1548, 1040), END = R(20, 20, 1382, 721);
+  var LIME = [
+    [0, R(20, 1080, 1880, 1040)], [1.0, FULL],
+    [5.7, FULL], [6.7, STRIP(4)], [7.5, SPAN(1, 4)],
+    [15.5, SPAN(1, 4)], [16.3, STRIP(2)], [17.1, SPAN(2, 5)],
+    [25.0, SPAN(2, 5)], [25.8, STRIP(3)], [26.6, SPAN(2, 5)],
+    [29.5, SPAN(2, 5)], [30.3, SPAN(0, 3)],
+    [34.8, SPAN(0, 3)], [35.6, FULL],
+    [41.6, FULL], [42.4, STRIP(1)], [43.2, MID],
+    [48.0, MID], [49.2, FULL]
+  ];
+  function lime(tt) {
+    if (tt <= LIME[0][0]) return LIME[0][1];
+    for (var i = 1; i < LIME.length; i++) {
+      if (tt <= LIME[i][0]) { var a = LIME[i - 1], b = LIME[i], s = ease((tt - a[0]) / (b[0] - a[0])); return R(lerp(a[1].x, b[1].x, s), lerp(a[1].y, b[1].y, s), lerp(a[1].w, b[1].w, s), lerp(a[1].h, b[1].h, s)); }
+    }
+    return LIME[LIME.length - 1][1];
+  }
+  /* the plate turns over (флип) between the arrow and the number */
+  var FLIPS = [[10.5, 11.1], [20.0, 20.6], [29.5, 30.3]];
+  function flipAt(tt) { for (var i = 0; i < FLIPS.length; i++) { var f = FLIPS[i]; if (tt > f[0] && tt < f[1]) { var p = (tt - f[0]) / (f[1] - f[0]); return { sx: Math.max(.02, Math.abs(Math.cos(Math.PI * p))), p: p }; } } return null; }
+
+  /* ---------- glass arrow: the frame under it shows through, shifted, with an iridescent rim ---------- */
+  var LAY = { key: '' };
+  function layers(w, h) { var key = w + 'x' + h; if (LAY.key !== key) { var a = E.makeCanvas(w, h), b = E.makeCanvas(w, h); LAY = { key: key, a: a, ax: a.getContext('2d'), b: b, bx: b.getContext('2d') }; } return LAY; }
+  function strokePolys(x, polys) { x.beginPath(); polys.forEach(function (p) { x.moveTo(p[0][0], p[0][1]); for (var i = 1; i < p.length; i++) x.lineTo(p[i][0], p[i][1]); }); x.stroke(); }
+  function bounds(polys) { var b = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 }; polys.forEach(function (p) { p.forEach(function (q) { b.x0 = Math.min(b.x0, q[0]); b.y0 = Math.min(b.y0, q[1]); b.x1 = Math.max(b.x1, q[0]); b.y1 = Math.max(b.y1, q[1]); }); }); return b; }
+  function glassArrow(ctx, polys, w, alpha, hl) {
+    if (!(alpha > 0)) return;
+    var cw = ctx.canvas.width, ch = ctx.canvas.height, L = layers(cw, ch), m = ctx.getTransform(), rim = Math.max(6, w * .15);
+    var a = L.ax;
+    a.setTransform(1, 0, 0, 1, 0, 0); a.globalCompositeOperation = 'source-over'; a.globalAlpha = 1; a.clearRect(0, 0, cw, ch);
+    a.setTransform(m); a.lineCap = 'round'; a.lineJoin = 'round'; a.lineWidth = w - rim; a.strokeStyle = '#FFFFFF'; strokePolys(a, polys);
+    a.setTransform(1, 0, 0, 1, 0, 0); a.globalCompositeOperation = 'source-in';
+    var sh = Math.max(2, w * .18 * Math.abs(m.a)); a.drawImage(ctx.canvas, -sh, -sh * .6);
+    a.globalCompositeOperation = 'source-atop'; a.globalAlpha = .45; a.fillStyle = '#F6FFD9'; a.fillRect(0, 0, cw, ch); a.globalAlpha = 1;
+    if (hl) { a.setTransform(m); var g = a.createRadialGradient(hl[0], hl[1], 0, hl[0], hl[1], w * 1.8); g.addColorStop(0, 'rgba(255,255,255,.8)'); g.addColorStop(1, 'rgba(255,255,255,0)'); a.fillStyle = g; a.fillRect(hl[0] - w * 2, hl[1] - w * 2, w * 4, w * 4); }
+    a.globalCompositeOperation = 'source-over';
+    var b = L.bx, bb = bounds(polys);
+    b.setTransform(1, 0, 0, 1, 0, 0); b.globalCompositeOperation = 'source-over'; b.globalAlpha = 1; b.clearRect(0, 0, cw, ch);
+    b.setTransform(m); b.lineCap = 'round'; b.lineJoin = 'round';
+    var gr = b.createLinearGradient(bb.x0, bb.y0, bb.x1, bb.y1);
+    gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.2, '#7B3FF2'); gr.addColorStop(.42, '#F2FFC8'); gr.addColorStop(.62, '#5A2BD8'); gr.addColorStop(.82, '#FFFFFF'); gr.addColorStop(1, '#8E5CFF');
+    b.lineWidth = w + rim * .5; b.strokeStyle = gr; strokePolys(b, polys);
+    b.globalCompositeOperation = 'destination-out'; b.lineWidth = w - rim; b.strokeStyle = '#000000'; strokePolys(b, polys);
+    b.globalCompositeOperation = 'source-over';
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = Math.min(1, alpha); ctx.drawImage(L.a, 0, 0); ctx.drawImage(L.b, 0, 0); ctx.restore();
+  }
+  function diag(cx, cy, len, leg) { return [[[cx - len, cy - len * .94], [cx, cy]], [[cx - leg, cy], [cx, cy], [cx, cy - leg]]]; }
+  function right(x0, x1, y, head) { return [[[x0, y], [x1, y]], [[x1 - head, y - head], [x1, y], [x1 - head, y + head]]]; }
+  function both(x0, x1, y, head) { return [[[x0, y], [x1, y]], [[x1 - head, y - head], [x1, y], [x1 - head, y + head]], [[x0 + head, y - head], [x0, y], [x0 + head, y + head]]]; }
+
+  /* ---------- pages on the plate ---------- */
+  function sc(s, tt, t0, dur, seed) { return E.scramble(s, (tt - t0) / dur, tt, seed); }
+  function titlePage(ctx, r, tt, a) {
+    var top = Math.max(r.y, r.y + r.h - (tt - .2) * 800);
+    ctx.save(); ctx.beginPath(); ctx.rect(r.x, top, r.w, r.y + r.h - top); ctx.clip();
+    ctx.globalAlpha = .09 * a; E.drawLoop(ctx, E.S.names, 60 * tt); ctx.globalAlpha = 1; ctx.restore();
+    var f1 = E.fitFont(ctx, 'после титров', 600, FD, 250, r.w - 92);
+    if (tt < 3.3) {
+      var a1 = a * (1 - ease((tt - 3.0) / .3));
+      text(ctx, sc('Сцена', tt, 1.0, .7, 22), r.x + 46, r.y + 690, f1, 'left', a1);
+      text(ctx, sc('после титров', tt, 1.2, .8, 23), r.x + 46, r.y + 920, f1, 'left', a1);
+      ctx.font = f1; var x0 = r.x + 46 + ctx.measureText('Сцена').width + 110, gl = ease((tt - 1.4) / .8);
+      glassArrow(ctx, right(x0, x0 + lerp(180, 560, gl), r.y + 602, 130), 96, a1 * win(tt, 1.4, 1e9, .5, 0), [x0 + lerp(180, 560, gl) - 120, r.y + 602]);
+    } else {
+      text(ctx, sc('Подведем', tt, 3.3, .6, 24), r.x + 46, r.y + 690, f1, 'left', a);
+      text(ctx, sc('итоги?', tt, 3.5, .7, 25), r.x + 46, r.y + 920, f1, 'left', a);
+    }
+    var f = (tt - 4.5) / 1.2;
+    if (f > 0 && f < 1) { var cx = lerp(-520, 2440, ease(f)), y = r.y + 640; glassArrow(ctx, right(cx - 400, cx + 380, y, 220), 112, 1, [cx + 240, y]); }
+  }
+  function arrowPage(ctx, r, tt, t0, top, bottom, a) {
+    if (!(a > 0)) return;
+    text(ctx, sc(top, tt, t0, .7, 31), r.x + 40, r.y + 140, '600 140px ' + FB, 'left', a);
+    text(ctx, sc(bottom, tt, t0 + .2, .8, 32), r.x + r.w - 40, r.y + r.h - 44, '600 140px ' + FB, 'right', a);
+    var d = lerp(-90, 60, ease((tt - t0) / 3.2)), ai = a * win(tt, t0 + .1, 1e9, .5, 0);
+    var cx = r.x + r.w * .79 + d, cy = r.y + r.h * .82 + d;
+    glassArrow(ctx, diag(cx, cy, r.w * .555, r.w * .56), 116, ai, [cx - 90, cy - 70]);
+  }
+  function numberPage(ctx, r, tt, t0, head, label, sub, num, a) {
+    if (!(a > 0)) return;
+    /* the pair stays on top with the glass arrow between its words, so the number reads as its answer */
+    var pr = head.split(' → '), fs = 84, gap, al, wa, wb, tot, room = r.w - 80;
+    for (var q = 0; q < 6; q++) { ctx.font = '600 ' + fs + 'px ' + FB; wa = ctx.measureText(pr[0]).width; wb = ctx.measureText(pr[1]).width; gap = fs * .3; al = fs * 2.3; tot = wa + wb + al + gap * 2; if (tot <= room) break; fs = Math.floor(fs * room / tot); }
+    var hx = r.x + 40, hy = r.y + 34 + fs, ins = ease((tt - t0) / .7), ax0 = hx + wa + gap, ax1 = ax0 + al * lerp(.25, 1, ins);
+    text(ctx, pr[0], hx, hy, '600 ' + fs + 'px ' + FB, 'left', a);
+    text(ctx, pr[1], hx + wa + gap * 2 + al, hy, '600 ' + fs + 'px ' + FB, 'left', a * ins);
+    glassArrow(ctx, right(ax0 + fs * .2, ax1 - fs * .2, hy - fs * .34, fs * .36), fs * .4, a, [ax1 - fs * .45, hy - fs * .34]);
+    text(ctx, DATA, r.x + 40, hy + 58, '500 30px ' + FB, 'left', a * .55);
+    text(ctx, sc(label, tt, t0 + .1, .7, 41), r.x + 40, r.y + 516, '600 62px ' + FB, 'left', a);
+    if (sub) text(ctx, sc(sub, tt, t0 + .3, .8, 42), r.x + r.w - 40, r.y + 512, '500 40px ' + FB, 'right', a * .85);
+    var font = E.fitFont(ctx, num, 600, FD, 620, r.w - 80);
+    text(ctx, sc(num, tt, t0 + .2, .9, 43), r.x + 30, r.y + r.h - 30, font, 'left', a);
+  }
+  function jokePage(ctx, r, tt, a) {
+    if (!(a > 0)) return;
+    var fn = '600 84px ' + FB, x = r.x + 40, y = r.y + 130;
+    ctx.font = fn; E.wrap(ctx, JOKE1, r.w - 80).forEach(function (l, i) { text(ctx, sc(l, tt, JT + .3 + i * .12, .6, 71 + i), x, y + i * 104, fn, 'left', a); });
+    var f2 = '600 118px ' + FD; ctx.font = f2; var l2 = E.wrap(ctx, JOKE2, r.w - 80), a2 = a * win(tt, JT + 2.4, 1e9, .4, 0);
+    l2.forEach(function (l, i) { text(ctx, sc(l, tt, JT + 2.4 + i * .15, .7, 79 + i), x, r.y + r.h - 60 - (l2.length - 1 - i) * 128, f2, 'left', a2); });
+  }
+  var AUTH = ['Марина Алексеева', 'Сергей Комаров', 'Наталья Ильина', 'Роман Тарасов', 'Вера Макарова', 'Илья Ковалев'];
+  var RCP = ['Ирине Беловой', 'Олегу Смирнову', 'Марии Лебедевой', 'Кириллу Орлову', 'Анне Кузнецовой', 'Денису Соколову', 'Елене Морозовой', 'Тимуру Волкову', 'Юлии Зайцевой', 'Павлу Титову', 'Ольге Гусевой'];
+  var S0 = 35.6, STEP = 1.0;
+  function hIdx(tt) { var h = 2; for (var i = 1; i <= 2; i++) h += ease((tt - (S0 + i * STEP)) / .4); return h; }
+  function twoLines(ctx, name, x, y, font, a) { var p = name.split(' '); text(ctx, p[0], x, y, font, 'left', a); text(ctx, p.slice(1).join(' '), x, y + 74, font, 'left', a); }
+  function whoPage(ctx, r, tt, a) {
+    if (!(a > 0)) return;
+    var h = hIdx(tt), font = '600 78px ' + FB;
+    RCP.forEach(function (n, j) { var d = j - h, y = 520 + d * 204; if (y < -100 || y > 1200) return; twoLines(ctx, n, r.x + 1233, y, font, a * lerp(.13, .92, clamp(1 - Math.abs(d), 0, 1))); });
+    AUTH.forEach(function (n, i) { var d = i - (h - 2), y = 520 + d * 204, al = clamp(1 - Math.abs(d) * 1.3, 0, 1); if (al > 0) twoLines(ctx, n, r.x + 44, y, font, a * .92 * al); });
+    var fly = ease((tt - 41.0) / .6) * 1500, y0 = 540;
+    glassArrow(ctx, right(r.x + 640 + fly, r.x + 1170 + fly, y0, 170), 104, a * win(tt, 35.4, 1e9, .5, 0), [r.x + 1060 + fly, y0]);
+    /* one short thank-you under the pair the names stop on */
+    var qa = a * win(tt, 38.2, 1e9, .5, 0);
+    if (qa > 0) text(ctx, QUOTE, r.x + 44, r.y + r.h - 70, E.fitFont(ctx, QUOTE, 600, FB, 60, 1150), 'left', qa);
+  }
+  function placeholder(ctx, x, y, w, h, label, a, round) {
+    if (!(a > 0)) return;
+    ctx.globalAlpha = a * .55; ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; ctx.setLineDash([10, 8]);
+    if (round) { ctx.beginPath(); ctx.arc(x + w / 2, y + h / 2, w / 2, 0, Math.PI * 2); } else E.rr(ctx, x, y, w, h, 14);
+    ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    text(ctx, label, x + w / 2, y + h / 2 + 10, '500 28px ' + FB, 'center', a * .6);
+  }
+  function bankPage(ctx, r, tt, a) {
+    if (!(a > 0)) return;
+    placeholder(ctx, r.x + 40, r.y + 40, 381, 75, 'лого', a);
+    var f = E.fitFont(ctx, 'на хорошем счету', 600, FD, 170, r.w - 60);
+    text(ctx, sc('Мы', tt, 43.0, .5, 51), r.x + 26, r.y + 614, f, 'left', a);
+    text(ctx, sc('друг у друга', tt, 43.2, .8, 52), r.x + 30, r.y + 792, f, 'left', a);
+    text(ctx, sc('на хорошем счету', tt, 43.4, .8, 53), r.x + 30, r.y + 970, f, 'left', a);
+    ctx.font = f; var bx = r.x + 26 + ctx.measureText('Мы').width + 90;
+    glassArrow(ctx, both(bx, bx + 380, r.y + 568, 62), 72, a * win(tt, 43.4, 1e9, .5, 0), [bx + 270, r.y + 560]);
+  }
+  function endFrame(ctx, tt) {
+    var a = win(tt, 48.2, 1e9, .6, 0); if (!(a > 0)) return;
+    var r = lime(tt), f = E.fitFont(ctx, 'банковским днем!', 600, FD, 210, r.w - 100), sz = parseInt(f.split(' ')[1], 10);
+    placeholder(ctx, r.x + 40, r.y + 40, 381, 75, 'лого', a);
+    text(ctx, sc('С Главным', tt, 48.4, .7, 61), r.x + 44, r.y + r.h - 70 - sz * 1.06, f, 'left', a);
+    text(ctx, sc('банковским днем!', tt, 48.6, .8, 62), r.x + 44, r.y + r.h - 70, f, 'left', a);
+  }
+  function slates(ctx, tt) {
+    var six = win(tt, 5.7, 43.2, .7, .8);
+    if (six > 0) for (var i = 0; i < 6; i++) E.panel(ctx, colX(i), 20, 300, 1040, COL.slate, six);
+    var two = win(tt, 42.4, 1e9, .8, 0) * (1 - ease((tt - 48.0) / .9));
+    if (two > 0) { E.panel(ctx, 20, 20, 150, 1040, COL.slate, two); E.panel(ctx, 1750, 20, 150, 1040, COL.slate, two); }
+  }
+
+  function draw(ctx, k, tt, md) {
+    var off = E.tapeOffset(tt), to = old(tt);
+    if (tt < 1.3) E.drawTape(ctx, off, 1);
+    E.corner(ctx, tt, off, { switchAt: .6, after: '' });
+    slates(ctx, to);
+    var r = lime(to), fl = flipAt(to);
+    ctx.save();
+    if (fl) { var cx = r.x + r.w / 2; ctx.translate(cx, 0); ctx.scale(fl.sx, 1); ctx.translate(-cx, 0); }
+    E.panel(ctx, r.x, r.y, r.w, r.h, COL.lime, 1);
+    ctx.save(); E.rr(ctx, r.x, r.y, r.w, r.h, 26); ctx.clip();
+    if (to < 6.2) titlePage(ctx, r, to, to < 5.7 ? 1 : 1 - (to - 5.7) / .5);
+    if (to >= 7.3 && to < 10.8) arrowPage(ctx, r, to, 7.4, 'Главные роли', 'вам', win(to, 7.3, 1e9, .3, 0));
+    if (to >= 10.8 && to < 16.0) numberPage(ctx, r, to, 10.8, 'Главные роли → вам', 'Имен в титрах', '', N1, to < 15.5 ? 1 : 1 - (to - 15.5) / .5);
+    if (to >= 16.9 && to < 20.3) arrowPage(ctx, r, to, 17.0, 'Коины', 'самым быстрым', win(to, 16.9, 1e9, .3, 0));
+    if (to >= 20.3 && tt < JT + .4) numberPage(ctx, r, to, 20.3, 'Коины → самым быстрым', 'Пасхалок разгадано', '', N2, 1 - ease((tt - JT) / .4));
+    if (tt >= JT && to < 25.5) jokePage(ctx, r, tt, tt < JE ? win(tt, JT + .2, 1e9, .4, 0) : 1 - (to - 25.0) / .5);
+    if (to >= 26.4 && to < 29.9) arrowPage(ctx, r, to, 26.5, 'Спасибо', 'друг другу', win(to, 26.4, 1e9, .3, 0));
+    if (to >= 29.9 && to < 35.3) numberPage(ctx, r, to, 29.9, 'Спасибо → друг другу', 'Благодарностей от коллег', '', N3, to < 34.8 ? 1 : 1 - (to - 34.8) / .5);
+    if (to >= 35.3 && to < 42.0) whoPage(ctx, r, to, win(to, 35.3, 42.0, .4, .4));
+    if (to >= 43.0 && to < 48.5) bankPage(ctx, r, to, win(to, 43.0, 48.5, .3, .4));
+    endFrame(ctx, to);
+    ctx.restore();
+    if (fl) E.panel(ctx, r.x, r.y, r.w, r.h, COL.fg, .16 * (1 - fl.sx));
+    ctx.restore();
+  }
+
+  function mm(x) { x = Math.round(x); return '0:' + (x < 10 ? '0' : '') + x; }
+  function S(a, b, rp, title, screen, txt, fix) { var na = N(a), nb = N(b); return { a: na, b: nb, rep: N(rp), title: title, time: mm(na) + '–' + mm(nb), screen: screen, text: txt, fix: fix }; }
+  var SC = [
+    { a: -4, b: 0, rep: -1.5, title: 'Конец последнего круга', time: 'до 0:00', screen: ['Угол: «Сейчас в титрах»'], text: 'Лента идет как обычно.' },
+    S(0, 3.3, 2.7, 'Сцена после титров', ['Сцена / после титров', 'Стрелка после слова «Сцена»'], 'Снизу въезжает лаймовая плашка на весь экран, по ней бегут имена. Название проявляется из случайных букв, за ним вырастает стеклянная стрелка.', 'Новое название вместо «Итоги трех дней». Стрелка стоит уже в первом кадре, сразу после названия. Дату «2–4 декабря» убрали: в сценарии ее нет.'),
+    S(3.3, 7.5, 4.3, 'Подведем итоги?', ['Подведем / итоги?'], 'Название сменяется вопросом. Стеклянная стрелка пролетает слева направо, плашка схлопывается в полоску среди шести серых панелей.', 'Новый кадр. Вопрос перед парами: дальше ролик на него отвечает.'),
+    S(7.5, 10.5, 9.2, 'Главные роли → вам', ['Главные роли', 'вам'], 'Крупно «Главные роли» и «вам», между ними стеклянная стрелка. Она медленно сползает по диагонали.', 'Новая пара вместо «Титры → каждому».'),
+    S(10.5, 15.5, 12.6, 'Имена', ['Главные роли → вам', DATA, 'Имен в титрах', N1], 'Плашка переворачивается. На обороте подпись и число, пара со стрелкой остается наверху.', 'Новая подпись. В сценарии число стоит первым: «7412 имен в титрах». В макете подпись выше числа, поэтому читается «Имен в титрах: 7412». Порядок нужно решить в дизайне.'),
+    S(15.5, 20.0, 18.8, 'Коины → самым быстрым', ['Коины', 'самым быстрым'], 'Плашка схлопывается в полоску, переезжает и разворачивается справа. Та же стрелка, новая пара.', 'Новая пара вместо «Титры → внимательным». Коины переехали сюда из кадра про спасибо.'),
+    S(20.0, 24.99, 21.8, 'Пасхалки', ['Коины → самым быстрым', DATA, 'Пасхалок разгадано', N2], 'Переворот, на обороте число пасхалок.', 'Новая подпись. Строки «счет еще идет» в сценарии нет.'),
+    { a: JT, b: JE, rep: JT + 3.6, title: 'Шутка про пасхалки', time: mm(JT) + '–' + mm(JE), screen: [JOKE1, JOKE2], text: 'Плашка стоит на месте, число уходит, на его месте шутка. Вторая фраза появляется позже и крупнее.', fix: 'Новый кадр, в черновике его не было. Текст длинный: 18 слов на 5,5 секунды, с 10 метров его не прочитать. Вида, как у пасхалок в титрах, пока нет: нужен макет.' },
+    { a: JE, b: N(29.5), rep: N(28.2), title: 'Спасибо → друг другу', time: mm(JE) + '–' + mm(N(29.5)), screen: ['Спасибо', 'друг другу'], text: 'Третья стрелка.', fix: 'Новая пара вместо «Коллега → коллеге».' },
+    S(29.5, 34.8, 32.0, 'Спасибо', ['Спасибо → друг другу', DATA, 'Благодарностей от коллег', N3], 'Плашка переворачивается и уезжает влево. На обороте число спасибо.', 'Новая подпись. Строку про коины убрали: они теперь во второй паре.'),
+    S(34.8, 41.6, 40.2, 'Кто кому', ['Наталья / Ильина', 'Анне / Кузнецовой', QUOTE], 'Плашка на весь экран. Имена сменяются два раза и останавливаются на одной паре. Под ней появляется одно короткое спасибо. Потом стрелка улетает направо.', 'К именам добавили текст одной благодарности, кадр стал дольше. Текст в кадре условный: настоящий выбираем из спасибо вместе с банком.'),
+    S(41.6, 48, 44.8, 'Друг у друга', ['Мы / друг у друга / на хорошем счету'], 'Плашка сжимается в полоску и разворачивается между двумя узкими панелями. Стрелка становится двусторонней. Вместо логотипа банка заглушка.', 'Новая фраза: «Мы друг у друга на хорошем счету». Второй вариант копирайтера: «Весь банк на хорошем счету друг у друга», как было.'),
+    { a: N(48), b: N(56), rep: N(51), title: 'Последний кадр', time: mm(N(48)) + ' и до конца дня', screen: ['С Главным / банковским днем!'], text: 'Плашка раскрывается на весь экран, на ней остается поздравление.', fix: 'В сценарии здесь только поздравление. Убрали три числа, строку «Счет еще идет», призыв ввести код и QR. Серые панели и белая плашка уходят.' }
+  ];
+
+  registerConcept({
+    id: 'matchmaker-script',
+    script: true,
+    arch: 'Сваха',
+    name: 'Стрелка · тексты копирайтера',
+    idea: 'Тот же черновик дизайн-команды с текстами копирайтера от 26 ноября. 12 кадров: название, вопрос, три пары с числами, шутка про пасхалки, имена с одним спасибо, главная фраза и поздравление. Ролик идет ' + Math.round(VIDEO_END) + ' секунд.',
+    strong: '', risk: '', take: null, how: [],
+    T0: -4, VIDEO_END: VIDEO_END, TEND: TEND,
+    keyT: N(9.2),
+    scenes: SC,
+    draw: draw
+  });
+})();
+
 /* Above the screen: one line about the idea, then short pluses and minuses */
 var INTRO = {
  "after-credits": {
@@ -2956,7 +3191,7 @@ var INTRO = {
   'use strict';
   var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   /* order of the creative partner: the three favourites first, then the rest */
-  var ORDER = ['matchmaker-design', 'everyperson', 'after-credits', 'athlete', 'matchmaker', 'translator', 'pioneer', 'scientist'];
+  var ORDER = ['matchmaker-script', 'matchmaker-design', 'everyperson', 'after-credits', 'athlete', 'matchmaker', 'translator', 'pioneer', 'scientist'];
   var TOP = { 'everyperson': 1, 'after-credits': 1, 'athlete': 1 };
   CONCEPTS.sort(function (a, b) { var i = ORDER.indexOf(a.id), j = ORDER.indexOf(b.id); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); });
   var byId = {}; CONCEPTS.forEach(function (c) { byId[c.id] = c; });
@@ -3008,9 +3243,10 @@ var INTRO = {
   /* ---------- building blocks ---------- */
   function buildTabs() {
     CONCEPTS.forEach(function (c, i) {
-      var b = el('button', 'tab' + (TOP[c.id] ? ' fav' : '') + (c.draft ? ' draft' : '')); b.type = 'button'; b.id = 'tab-' + c.id; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'panel');
+      var b = el('button', 'tab' + (TOP[c.id] ? ' fav' : '') + (c.draft || c.script ? ' draft' : '')); b.type = 'button'; b.id = 'tab-' + c.id; b.setAttribute('role', 'tab'); b.setAttribute('aria-controls', 'panel');
       if (TOP[c.id]) { b.appendChild(crown()); b.title = 'Лучшие три'; }
       if (c.draft) { b.appendChild(el('span', 'badge', 'черновик финала')); b.title = 'Черновик финального дизайна'; }
+      if (c.script) { b.appendChild(el('span', 'badge', 'тексты 26 ноября')); b.title = 'Черновик с текстами копирайтера'; }
       b.appendChild(document.createTextNode(c.name));
       b.addEventListener('click', function () { select(c.id, true); });
       b.addEventListener('keydown', function (e) {
@@ -3025,7 +3261,7 @@ var INTRO = {
   var INTROS = (typeof INTRO === 'object' && INTRO) || {};
   function renderIntro() {
     introEl.textContent = '';
-    var row = el('div', 'row'); row.appendChild(el('span', 'eyebrow', 'Архетип: ' + cur.arch)); if (cur.recommended) row.appendChild(el('span', 'chip', 'Рекомендуем')); if (cur.draft) row.appendChild(el('span', 'chip', 'Черновик финального дизайна')); introEl.appendChild(row);
+    var row = el('div', 'row'); row.appendChild(el('span', 'eyebrow', 'Архетип: ' + cur.arch)); if (cur.recommended) row.appendChild(el('span', 'chip', 'Рекомендуем')); if (cur.draft) row.appendChild(el('span', 'chip', 'Черновик финального дизайна')); if (cur.script) row.appendChild(el('span', 'chip', 'Тексты копирайтера, 26 ноября')); introEl.appendChild(row);
     introEl.appendChild(el('h2', null, cur.name));
     var x = INTROS[cur.id];
     if (!x) { introEl.appendChild(el('p', 'one', cur.idea)); return; }
